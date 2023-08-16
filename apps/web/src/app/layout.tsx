@@ -73,10 +73,10 @@ export default function RootLayout({
                   </li>
                   <li>
                     <Link
-                      href="https://github.com/neuralsentry"
+                      href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
                       target="_blank"
                     >
-                      Project
+                      Commit Classifier
                     </Link>
                   </li>
                 </ul>
