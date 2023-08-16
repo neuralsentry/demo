@@ -9,7 +9,7 @@ export default function Home() {
         </h1>
         <p className="py-6 max-w-[60ch] mt-2">
           Test your skills and see if you can detect more vulnerable C/C++
-          functions than our Artificial Intelligence.
+          functions than our Artificial Intelligence (AI) model.
         </p>
         <div className="mt-10 gap-x-5">
           <Link href="/challenge">
