@@ -8,21 +8,22 @@ import { sql, and, lte, gte, eq } from "drizzle-orm";
 import { validate } from "@/shared/utils";
 import { client } from "@/shared/db/client";
 import * as schema from "@/shared/db/schema";
-import { modelPrediction } from "@/shared/db/schema";
+import { modelPrediction, func } from "@/shared/db/schema";
 
 const db = drizzle(client, { schema });
 
 const getCVEsSchema = z.object({
   query: z.object({
     limit: z.coerce.number().min(1).max(50).default(10),
-    page: z.coerce.number().min(1).default(1)
+    page: z.coerce.number().min(1).default(1),
+    num_lines: z.coerce.number().min(1).default(10)
   })
 });
 
 export const routes = Router()
   .get("/cves", async (req, res) => {
     const {
-      query: { limit, page }
+      query: { limit, page, num_lines }
     } = await validate(getCVEsSchema, req);
 
     const cves = await db.query.cve.findMany({
@@ -32,7 +33,8 @@ export const routes = Router()
             modelPredictions: {
               where: eq(modelPrediction.model_id, 1)
             }
-          }
+          },
+          where: eq(func.num_lines, num_lines)
         }
       },
       limit: limit,
