@@ -14,10 +14,10 @@ export const cve = pgTable(
   "cve",
   {
     id: serial("id").primaryKey(),
-    cve: text("cve").notNull()
+    name: text("name").notNull()
   },
   (t) => ({
-    cve_idx: uniqueIndex("cve_idx").on(t.cve)
+    name_idx: uniqueIndex("name_idx").on(t.name)
   })
 );
 
@@ -33,13 +33,13 @@ export const func = pgTable("function", {
   code: text("code").notNull(),
   labels: smallint("labels").notNull(),
   num_lines: integer("num_lines").notNull(),
-  cve: text("cve")
+  cve_name: text("cve_name")
 });
 
 export const funcRelations = relations(func, ({ one, many }) => ({
   cve: one(cve, {
-    fields: [func.cve],
-    references: [cve.cve]
+    fields: [func.cve_name],
+    references: [cve.name]
   }),
   modelPredictions: many(modelPrediction)
 }));

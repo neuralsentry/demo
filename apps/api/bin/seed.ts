@@ -23,17 +23,21 @@ async function main() {
     await fs.readFile("./bin/model_predictions.json", "utf-8")
   );
 
-  await db.insert(cve).values(cves);
+  await db
+    .insert(cve)
+    .values(cves.map(({ cve, ...c }) => ({ ...c, name: cve })));
   await db
     .insert(func)
     .values(
-      functions.map(({ cve, ...f }) => ({ ...f, cve: cve ?? undefined }))
+      functions.map(({ cve, ...f }) => ({ ...f, cve_name: cve ?? undefined }))
     );
   await db.insert(model).values(models);
 
   const batchSize = 1000;
   for (let i = 0; i < modelPredictions.length; i += batchSize) {
-    await db.insert(modelPrediction).values(modelPredictions.slice(i, i + batchSize));
+    await db
+      .insert(modelPrediction)
+      .values(modelPredictions.slice(i, i + batchSize));
   }
 }
 
