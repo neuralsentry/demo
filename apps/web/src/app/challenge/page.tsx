@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { clsx } from "clsx";
+import Image from "next/image";
 import { Info } from "lucide-react";
-import { useInterval } from "usehooks-ts";
+import { useEffect, useMemo, useState } from "react";
+import { useInterval, useLocalStorage } from "usehooks-ts";
 
 import { CodeBlock } from "./components/code-block";
 import { ProgressIndicator } from "./components/progress-indicator.component";
-import { clsx } from "clsx";
 
 const headings = [
   "Hmmm, what about this one?",
@@ -86,6 +87,7 @@ export default function Start() {
   const [choiceIndex, setChoiceIndex] = useState(-1);
   const [miliseconds, setMiliseconds] = useState(30 * 1000);
   const [isStarted, setIsStarted] = useState(false);
+  const [displayHelp, setDisplayHelp] = useLocalStorage("displayHelp", true);
 
   const handleStartClick = () => {
     setIsStarted(true);
@@ -103,7 +105,7 @@ export default function Start() {
     [userAnswers]
   );
 
-  const isComplete = userAnswers.length === 10;
+  const isComplete = userAnswers.length === 10 || miliseconds === 0;
 
   useInterval(() => {
     if (!isStarted) {
@@ -175,8 +177,52 @@ export default function Start() {
     return headings[random];
   }, [userAnswers]);
 
+  useEffect(() => {
+    if (displayHelp && window) {
+      (window as any).help_modal?.close();
+      (window as any).help_modal?.showModal();
+    }
+  }, [displayHelp]);
+
   return (
     <main className="mb-10">
+      <dialog id="help_modal" className="modal w-full">
+        <form method="dialog" className="modal-box max-w-lg w-full">
+          <h3 className="font-bold text-xl">Instructions</h3>
+          <section className="py-4 flex gap-y-4 flex-col">
+            <p>
+              You will be given 10 C/C++ functions, where some are vulnerable
+              and some are not.
+            </p>
+            <p>
+              Try to correctly classify as many functions as possible within the
+              30s time limit.
+            </p>
+            <p>
+              You also have a strong competitor! Our AI model will also try to
+              classify the functions. You can see yours and the AI's progress
+              below:
+            </p>
+            <Image
+              className="rounded-xl border border-gray-700 shadow-xl"
+              src="/progress-indicator.png"
+              width={600}
+              height={200}
+              alt="Progress indicator"
+            />
+            <p>
+              Press ESC key or click the button below to close. Then, you may
+              click the start button to begin the timer.
+            </p>
+          </section>
+          <div className="modal-action">
+            <button className="btn" onClick={() => setDisplayHelp(false)}>
+              Close
+            </button>
+          </div>
+        </form>
+      </dialog>
+
       <header className="flex items-end justify-between mt-5">
         <div>
           <h1>
@@ -237,7 +283,10 @@ export default function Start() {
         >
           <div className="indicator">
             <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
-              <div className="tooltip" data-tip={`Ryzen 5 5600X, ${cpuIterationsPerSecond} iteration/s`}>
+              <div
+                className="tooltip"
+                data-tip={`Ryzen 5 5600X, ${cpuIterationsPerSecond} iteration/s`}
+              >
                 <Info size={14} strokeWidth={3} />
               </div>
             </span>
@@ -254,7 +303,10 @@ export default function Start() {
           />
           <div className="indicator">
             <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
-              <div className="tooltip" data-tip={`NVIDIA GeForce RTX 3070 Ti, ${gpuIterationsPerSecond} iteration/s`}>
+              <div
+                className="tooltip"
+                data-tip={`NVIDIA GeForce RTX 3070 Ti, ${gpuIterationsPerSecond} iteration/s`}
+              >
                 <Info size={14} strokeWidth={3} />
               </div>
             </span>
@@ -277,17 +329,14 @@ export default function Start() {
           const isActive = choiceIndex === i;
           return (
             <div
+              key={`${choice}-${i}`}
               className={clsx(
                 "border p-4 rounded-xl border-neutral",
                 isStarted && !isComplete
                   ? [
                       "cursor-pointer",
-                      "hover:border-gray-400",
-                      isActive && [
-                        "border-primary",
-                        "bg-primary",
-                        "bg-opacity-20"
-                      ]
+                      "hover:border-gray-500",
+                      isActive && ["border-gray-500", "bg-opacity-20"]
                     ]
                   : ["text-gray-600", "border-neutral-900"]
               )}
