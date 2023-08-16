@@ -34,7 +34,7 @@ export const routes = Router()
               where: eq(modelPrediction.model_id, 1)
             }
           },
-          where: eq(func.num_lines, num_lines)
+          where: lte(func.num_lines, num_lines)
         }
       },
       limit: limit,
