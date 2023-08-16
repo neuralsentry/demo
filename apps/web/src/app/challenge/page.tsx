@@ -1,6 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
+import Link from "next/link";
 import Image from "next/image";
 import { Info } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -184,6 +185,13 @@ export default function Start() {
     }
   }, [displayHelp]);
 
+  useEffect(() => {
+    if (isComplete) {
+      (window as any).quiz_complete_modal?.close();
+      (window as any).quiz_complete_modal?.showModal();
+    }
+  }, [isComplete]);
+
   return (
     <main className="mb-10">
       <dialog id="help_modal" className="modal w-full">
@@ -219,6 +227,46 @@ export default function Start() {
             <button className="btn" onClick={() => setDisplayHelp(false)}>
               Close
             </button>
+          </div>
+        </form>
+      </dialog>
+
+      <dialog id="quiz_complete_modal" className="modal w-full">
+        <form method="dialog" className="modal-box max-w-lg w-full">
+          <h3 className="font-bold text-5xl text-center text-secondary">
+            {miliseconds === 0 ? "Time's up!" : "Quiz complete!"}
+          </h3>
+          <section className="py-4 flex gap-y-4 flex-col text-justify">
+            <p>
+              You have completed the challenge. Don't worry if you didn't get a
+              good score!
+            </p>
+            <p>
+              The purpose of this challenge is actually to demonstrate the
+              effectiveness of using AI to detect vulnerabilities.
+            </p>
+            <p>
+              You may have noticed that the AI model is able to classify the
+              functions with{" "}
+              <span className="font-bold text-secondary">high accuracy</span>{" "}
+              and is <span className="font-bold text-secondary">very fast</span>
+              .
+            </p>
+            <p>
+              These models were trained as part of our research. However, this
+              is just a small portion of our research.
+            </p>{" "}
+            <p>
+              Click the button below to learn more! Or, better yet, come on down
+              to <span className="font-bold text-secondary ">T69 #2913</span> so
+              we can share more!
+            </p>
+          </section>
+          <div className="modal-action justify-between">
+            <button className="btn">Close</button>
+            <Link href="/about" className="btn btn-primary">
+              Learn more
+            </Link>
           </div>
         </form>
       </dialog>
