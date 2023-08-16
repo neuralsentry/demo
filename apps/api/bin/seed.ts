@@ -19,6 +19,9 @@ async function main() {
   const models: any[] = JSON.parse(
     await fs.readFile("./bin/models.json", "utf-8")
   );
+  const modelPredictions: any[] = JSON.parse(
+    await fs.readFile("./bin/model_predictions.json", "utf-8")
+  );
 
   await db.insert(cve).values(cves);
   await db
@@ -27,6 +30,11 @@ async function main() {
       functions.map(({ cve, ...f }) => ({ ...f, cve: cve ?? undefined }))
     );
   await db.insert(model).values(models);
+
+  const batchSize = 1000;
+  for (let i = 0; i < modelPredictions.length; i += batchSize) {
+    await db.insert(modelPrediction).values(modelPredictions.slice(i, i + batchSize));
+  }
 }
 
 main()

@@ -32,6 +32,7 @@ export const func = pgTable("function", {
   id: serial("id").primaryKey(),
   code: text("code").notNull(),
   labels: smallint("labels").notNull(),
+  num_lines: integer("num_lines").notNull(),
   cve: text("cve")
 });
 
@@ -40,7 +41,7 @@ export const funcRelations = relations(func, ({ one, many }) => ({
     fields: [func.cve],
     references: [cve.cve]
   }),
-  modelPrediction: many(modelPrediction)
+  modelPredictions: many(modelPrediction)
 }));
 
 export type Func = InferModel<typeof func>;
@@ -73,7 +74,7 @@ export type NewModel = InferModel<typeof model, "insert">;
 export const modelPrediction = pgTable("model_prediction", {
   id: serial("id").primaryKey(),
   prediction: smallint("prediction").notNull(),
-  prediction_softmax: doublePrecision("prediction_softmax").notNull(),
+  probability: doublePrecision("probability").notNull(),
   model_id: integer("model_id").notNull(),
   func_id: integer("func_id").notNull()
 });

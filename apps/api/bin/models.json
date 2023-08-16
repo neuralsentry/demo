@@ -3,18 +3,18 @@
     "name": "v1",
     "description": "Trained on 33,033 C/C++ functions from 4 different repositories",
     "hf_hub_id": "neuralsentry/vulnerabilityDetection-StarEncoder-DevignPublic9010",
-    "accuracy": 0.63,
-    "precision": 0.63,
-    "recall": 0.63,
-    "f1": 0.63
+    "accuracy": 50.83,
+    "precision": 51.0,
+    "recall": 51.0,
+    "f1": 49.0
   },
   {
     "name": "v2",
     "description": "Trained on 71,214 C/C++ functions from 508 different repositories",
     "hf_hub_id": "neuralsentry/vulnerabilityDetection-StarEncoder-BigvulCvefixesDevignReveal",
-    "accuracy": 0.89,
-    "precision": 0.89,
-    "recall": 0.89,
-    "f1": 0.89
+    "accuracy": 89.4,
+    "precision": 89.0,
+    "recall": 89.0,
+    "f1": 89.0
   }
 ]
