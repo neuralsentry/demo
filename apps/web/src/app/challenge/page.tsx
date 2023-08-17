@@ -205,9 +205,13 @@ export default function Start() {
     <main className="mb-20">
       <dialog id="help_modal" className="modal w-full">
         <form
+          autoFocus
           method="dialog"
           className="modal-box max-w-lg w-full max-h-[600px] border border-base-200"
         >
+          <button>
+            {/* keep this empty button so the browser doesn't auto scroll past the modal */}
+          </button>
           <h3 className="font-bold text-4xl text-center">Welcome!</h3>
           <section className="py-4 mt-2 flex gap-y-4 flex-col text-justify">
             <h4 className="font-bold text-xl text-center">Instructions</h4>
@@ -257,22 +261,13 @@ export default function Start() {
               Before you start, remember to click the start button to trigger
               the timer.
             </p>
-            <h4 className="text-center text-sm font-light">
-              Look for this button at the bottom of the page.
-            </h4>
-            <Image
-              className="rounded-xl border border-gray-700 shadow-xl"
-              src="/start-button.png"
-              width={600}
-              height={200}
-              alt="Progress indicator"
-            />
             <p>
               When you're ready, press the{" "}
               <kbd className="align-middle kbd kbd-xs">ESC</kbd> key or click
               the button below to close.
             </p>
           </section>
+
           <div className="modal-action">
             <button className="btn" onClick={() => setDisplayHelp(false)}>
               Close
@@ -286,7 +281,10 @@ export default function Start() {
           method="dialog"
           className="modal-box max-w-lg w-full max-h-[600px] sm:pb-0 border border-base-200"
         >
-          <h3 className="font-bold text-5xl text-center text-secondary">
+          <button>
+            {/* keep this empty button so the browser doesn't auto scroll past the modal */}
+          </button>
+          <h3 className="font-bold text-5xl text-center">
             {miliseconds === 0 ? "Time's up!" : "Challenge Completed!"}
           </h3>
 
