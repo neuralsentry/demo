@@ -263,7 +263,14 @@ export default function Start() {
             </p>
           </section>
           <div className="modal-action justify-between">
-            <button className="btn">Close</button>
+            <button
+              className="btn"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Try again
+            </button>
             <Link href="/about" className="btn btn-primary">
               Learn more
             </Link>
