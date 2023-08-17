@@ -262,7 +262,7 @@ export function DrawerNavbar({ children }: Props) {
               </li>
               <li>
                 <Link
-                  href="/ai"
+                  href="/ai/functions"
                   onClick={() => setDrawer(false)}
                   className="block"
                 >
