@@ -12,3 +12,10 @@ body {
   overflow-x: hidden;
   position: relative;
 }
+
+.syntaxhighlighter {
+  scrollbar-width: none !important;
+}
+.syntaxhighlighter::-webkit-scrollbar {
+  display: none !important;
+}

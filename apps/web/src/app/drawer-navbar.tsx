@@ -70,7 +70,7 @@ export function DrawerNavbar({ children }: Props) {
                       <Link href="/leaderboard">Leaderboard</Link>
                     </li>
                     <li>
-                      <Link href="/vulnerabilities">Vulnerabilities</Link>
+                      <Link href="/ai">AI</Link>
                     </li>
                   </ul>
                 </div>
@@ -158,8 +158,8 @@ export function DrawerNavbar({ children }: Props) {
                 </Link>
               </li>
               <li>
-                <Link href="/vulnerabilities" onClick={() => setDrawer(false)}>
-                  Vulnerabilities
+                <Link href="/ai" onClick={() => setDrawer(false)}>
+                  AI
                 </Link>
               </li>
             </ul>
