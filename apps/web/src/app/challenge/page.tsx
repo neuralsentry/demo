@@ -254,10 +254,23 @@ export default function Start() {
               That's All, Good Luck!
             </h4>
             <p>
+              Before you start, remember to click the start button to trigger
+              the timer.
+            </p>
+            <h4 className="text-center text-sm font-light">
+              Look for this button at the bottom of the page.
+            </h4>
+            <Image
+              className="rounded-xl border border-gray-700 shadow-xl"
+              src="/start-button.png"
+              width={600}
+              height={200}
+              alt="Progress indicator"
+            />
+            <p>
               When you're ready, press the{" "}
               <kbd className="align-middle kbd kbd-xs">ESC</kbd> key or click
-              the button below to close. Then, you can click the start button to
-              begin the timer.
+              the button below to close.
             </p>
           </section>
           <div className="modal-action">
