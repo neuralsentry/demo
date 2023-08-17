@@ -3,7 +3,7 @@
 import { clsx } from "clsx";
 import Link from "next/link";
 import Image from "next/image";
-import { Info } from "lucide-react";
+import { ChevronDownCircle, Info } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useInterval, useLocalStorage } from "usehooks-ts";
 
@@ -19,10 +19,9 @@ async function getFunctions(): Promise<Func[]> {
       randomise: true,
       limit: 10,
       maxNumLines: 10,
-      minNumLines: 5
+      minNumLines: 10
     }
   });
-
   return res.data.data;
 }
 
@@ -79,8 +78,13 @@ export default function Start() {
   const [miliseconds, setMiliseconds] = useState(30 * 1000);
   const [isStarted, setIsStarted] = useState(false);
   const [displayHelp, setDisplayHelp] = useLocalStorage("displayHelp", true);
+  const [displayProgress, setDisplayProgress] = useState(false);
 
-  const funcs = useQuery({ queryKey: ["functions"], queryFn: getFunctions });
+  const funcs = useQuery({
+    queryKey: ["functions"],
+    queryFn: getFunctions,
+    refetchOnWindowFocus: false
+  });
 
   const handleStartClick = () => {
     setIsStarted(true);
@@ -188,7 +192,6 @@ export default function Start() {
   const getModelPredictionErrorIndexes = useCallback(
     (modelPredictions: number[], labels: number[]) => {
       return modelPredictions.reduce((acc, prediction, i) => {
-        console.log(prediction, labels[i]);
         if (prediction === labels[i]) {
           return acc;
         }
@@ -198,8 +201,12 @@ export default function Start() {
     [funcs.data]
   );
 
+  useEffect(() => {
+    console.log(userAnswers);
+  }, [userAnswers]);
+
   return (
-    <main className="mb-10">
+    <main className="mb-20">
       <dialog id="help_modal" className="modal w-full">
         <form method="dialog" className="modal-box max-w-lg w-full">
           <h3 className="font-bold text-xl">Instructions</h3>
@@ -269,14 +276,7 @@ export default function Start() {
             </p>
           </section>
           <div className="modal-action justify-between">
-            <button
-              className="btn"
-              onClick={() => {
-                window.location.reload();
-              }}
-            >
-              Try again
-            </button>
+            <button className="btn">Close</button>
             <Link href="/about" className="btn btn-primary">
               Learn more
             </Link>
@@ -284,7 +284,7 @@ export default function Start() {
         </form>
       </dialog>
 
-      <header className="flex items-end justify-between mt-5">
+      <header className="flex justify-center sm:justify-start mt-20 sm:mt-5">
         <div>
           <h1>
             <span className="text-6xl font-bold text-secondary">
@@ -300,14 +300,19 @@ export default function Start() {
         </div>
       </header>
 
-      <header className="flex items-end justify-between mt-5">
+      <header
+        className={clsx(
+          "flex flex-col items-center justify-between mt-5 text-center",
+          "sm:flex-row sm:text-start sm:items-end"
+        )}
+      >
         <div>
           <h2 className="mt-2 text-3xl font-bold">{currentHeading}</h2>
           <h3 className="mt-2 text-gray-400">
             If you're not sure, just guess!
           </h3>
         </div>
-        <div className="font-mono">
+        <div className="font-mono  mt-4 md:mt-0">
           <span className="ml-5 text-4xl">
             {(miliseconds / 1000).toFixed(2)}
           </span>
@@ -322,7 +327,9 @@ export default function Start() {
           </div>
         ) : funcs.isSuccess ? (
           <CodeBlock
-            code={funcs.data[userAnswers.length].code}
+            code={funcs.data[
+              userAnswers.length > 9 ? 9 : userAnswers.length
+            ].code.trim()}
             language="cpp"
           />
         ) : (
@@ -330,9 +337,34 @@ export default function Start() {
         )}
       </div>
 
-      <div className="flex justify-center items-center mx-auto mt-4 gap-x-10">
+      <div
+        className={clsx(
+          "md:border-none",
+          "flex flex-col-reverse md:flex-row justify-center items-center mx-auto mt-0 md:mt-4 gap-x-10",
+          "fixed top-0 left-2/4 transform -translate-x-2/4 z-10 md:relative rounded-b-xl border border-t-0 border-gray-500",
+          "bg-base-100 md:bg-inherit px-4 py-2 md:p-0 w-full max-w-sm  md:max-w-full",
+          "transition-transform duration-500 ease-in-out",
+          !displayProgress && "-translate-y-[200px] md:translate-y-0"
+        )}
+      >
+        <button
+          className="btn btn-circle md:hidden mt-4 btn-primary fixed bottom-[-20px] scale-75"
+          onClick={() => setDisplayProgress((prev) => !prev)}
+        >
+          <ChevronDownCircle
+            size={30}
+            className={clsx(
+              "transition-transform duration-500 ease-in-out",
+              !displayProgress && "rotate-180"
+            )}
+          />
+        </button>
+        <h3 className="mt-2 text-center mb-4 md:hidden">
+          Progress{" "}
+          <span className="text-xs text-gray-500">(Correct / Total)</span>
+        </h3>
         <div
-          className="grid items-center gap-x-7"
+          className="mt-4 grid items-center gap-x-7"
           style={{
             gridTemplateColumns: "minmax(0, max-content) minmax(0, 1fr)"
           }}
@@ -344,9 +376,9 @@ export default function Start() {
             errorIndexes={incorrectUserAnswerIndexes || []}
           />
         </div>
-
-        <div className="divider divider-horizontal">vs</div>
-
+        <div className="divider max-w-sm md:divider-horizontal mx-auto w-full">
+          vs
+        </div>
         <div
           className="grid items-center gap-x-7"
           style={{
@@ -473,41 +505,49 @@ export default function Start() {
         </div>
       </div>
 
-      <div className="flex flex-col mt-10 gap-y-5">
-        {["Vulnerable", "Not Vulnerable"].map((choice, i) => {
-          const isActive = choiceIndex === i;
-          return (
-            <div
-              key={`${choice}-${i}`}
-              className={clsx(
-                "border p-4 rounded-xl border-neutral",
-                isStarted && !isComplete
-                  ? [
-                      "cursor-pointer",
-                      "hover:border-gray-500",
-                      isActive && ["border-gray-500", "bg-opacity-20"]
-                    ]
-                  : ["text-gray-600", "border-neutral-900"]
-              )}
-              onClick={() => handleChoiceClick(i)}
-            >
-              {choice}
-            </div>
-          );
-        })}
-      </div>
+      <div className="flex flex-col">
+        <div className="flex flex-col mt-10 md:mt-4 gap-y-5">
+          {["Vulnerable", "Not Vulnerable"].map((choice, i) => {
+            const isActive = choiceIndex === i;
+            return (
+              <div
+                key={`${choice}-${i}`}
+                className={clsx(
+                  "border p-4 rounded-xl border-neutral",
+                  isStarted && !isComplete
+                    ? [
+                        "cursor-pointer bg-opacity-20",
+                        "hover:border-gray-500",
+                        isActive && "bg-gray-700 border-gray-500"
+                      ]
+                    : ["text-gray-600", "border-neutral-900"]
+                )}
+                onClick={() => handleChoiceClick(i)}
+              >
+                {choice}
+              </div>
+            );
+          })}
+        </div>
 
-      <button
-        className={clsx(
-          "mt-10 btn btn-primary w-full",
-          !isStarted && ["btn-secondary"],
-          isStarted && (isComplete || choiceIndex === -1) && ["btn-disabled"]
-        )}
-        onClick={isStarted ? handleNextClick : handleStartClick}
-        disabled={isComplete}
-      >
-        {isStarted ? "Next" : "Start"}
-      </button>
+        <button
+          className={clsx(
+            "mt-10 btn btn-primary w-full",
+            !isStarted && ["btn-secondary"],
+            isComplete && ["btn-secondary"]
+          )}
+          onClick={
+            isComplete
+              ? () => window.location.reload()
+              : isStarted
+              ? handleNextClick
+              : handleStartClick
+          }
+          disabled={!isComplete && isStarted && choiceIndex === -1}
+        >
+          {isComplete ? "Restart" : isStarted ? "Next" : "Start"}
+        </button>
+      </div>
     </main>
   );
 }
