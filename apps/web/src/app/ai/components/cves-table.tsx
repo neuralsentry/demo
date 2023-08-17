@@ -241,7 +241,7 @@ export function CVEsTable() {
                           href={`https://nvd.nist.gov/vuln/detail/${cve.name}`}
                           target="_blank"
                         >
-                          <ExternalLink className="indicator-item" size={14} />
+                          <ExternalLink className="indicator-item z-[-10]" size={14} />
                           <span className="pr-2">{cve.name}</span>
                         </a>
                       </div>
