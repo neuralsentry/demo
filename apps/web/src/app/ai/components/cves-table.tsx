@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import Link from "next/link";
 import { ExternalLink, Info } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
@@ -7,25 +8,12 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import { axios } from "@/shared/axios";
-
-async function getFunctions() {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/functions`);
-  url.searchParams.append("limit", "10");
-  const res = await fetch(url.toString(), {
-    cache: "no-cache"
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch functions");
-  }
-
-  return res.json();
-}
+import { CodeBlock } from "@/app/challenge/components/code-block";
 
 async function getCVEs(
   limit = 10,
   page = 1,
-  includeCode = false
+  includeCode = true
 ): Promise<CVE[]> {
   const res = await axios.get("/cves", {
     params: {
@@ -140,6 +128,8 @@ export function CVEsTable() {
   });
   const count = useQuery({ queryKey: ["cvesCount"], queryFn: getCVEsCount });
 
+  const [funcIndex, setFuncIndex] = useState(0);
+
   return (
     <div>
       <div className="mt-5 flex flex-col-reverse items-center gap-y-2 md:items-end md:flex-row md:justify-between">
@@ -237,18 +227,24 @@ export function CVEsTable() {
                           href={`https://nvd.nist.gov/vuln/detail/${cve.name}`}
                           target="_blank"
                         >
-                          <ExternalLink className="indicator-item" size={14} />
+                          <ExternalLink
+                            className="indicator-item z-[-10]"
+                            size={14}
+                          />
                           <span className="pr-2">{cve.name}</span>
                         </a>
                       </div>
                     </td>
                     <td>
-                      <Link
+                      <button
                         className="btn btn-xs px-5"
-                        href={`/cve/${cve.name}#functions`}
+                        onClick={() => {
+                          setFuncIndex(0);
+                          (window as any)[`${cve.name}-modal`].showModal();
+                        }}
                       >
                         {cve.funcs.length}
-                      </Link>
+                      </button>
                     </td>
                     <td>
                       <div className="flex items-center gap-x-4">
@@ -307,12 +303,87 @@ export function CVEsTable() {
                       </div>
                     </td>
                     <td>
-                      <Link
+                      <button
                         className="btn btn-xs btn-ghost px-5"
-                        href={`/cve/${cve.name}`}
+                        onClick={() => {
+                          setFuncIndex(0);
+                          (window as any)[`${cve.name}-modal`].showModal();
+                        }}
                       >
                         View
-                      </Link>
+                      </button>
+                      <dialog id={`${cve.name}-modal`} className="modal">
+                        <form method="dialog" className="modal-box">
+                          <h3 className="font-bold text-xl text-center">
+                            {cve.name}
+                          </h3>
+                          <p className="mt-2 text-sm text-gray-400 text-center">
+                            Showing {funcIndex + 1} of {cve.funcs.length}{" "}
+                            functions
+                          </p>
+
+                          <p className="mt-2 text-xs text-gray-400 text-center">
+                            Predictions:
+                          </p>
+                          <div className="mt-1 flex justify-center items-center gap-x-2">
+                            <div
+                              className={clsx(
+                                "badge",
+                                cve.funcs[funcIndex]?.labels ==
+                                  cve.funcs[funcIndex]?.model_predictions?.[0]
+                                    ?.prediction
+                                  ? "badge-success"
+                                  : "badge-error"
+                              )}
+                            >
+                              V1
+                            </div>
+                            <div
+                              className={clsx(
+                                "badge",
+                                cve.funcs[funcIndex]?.labels ==
+                                  cve.funcs[funcIndex]?.model_predictions?.[1]
+                                    ?.prediction
+                                  ? "badge-success"
+                                  : "badge-error"
+                              )}
+                            >
+                              V2
+                            </div>
+                          </div>
+                          <CodeBlock
+                            className="max-h-[210px] rounded-md mt-4"
+                            code={cve.funcs[funcIndex]?.code}
+                            language="cpp"
+                          />
+                          <div className="mt-5 gap-x-5 flex justify-between items-end">
+                            <div
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => {
+                                if (funcIndex > 0) {
+                                  setFuncIndex(funcIndex - 1);
+                                }
+                              }}
+                            >
+                              Previous
+                            </div>
+                            <div
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => {
+                                if (funcIndex < cve.funcs.length - 1) {
+                                  setFuncIndex(funcIndex + 1);
+                                }
+                              }}
+                            >
+                              Next
+                            </div>
+                          </div>
+                          <div className="modal-action">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn mx-auto">Close</button>
+                          </div>
+                        </form>
+                      </dialog>
                     </td>
                   </tr>
                 );
