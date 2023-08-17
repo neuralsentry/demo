@@ -162,9 +162,7 @@ export function DrawerNavbar({ children }: Props) {
 
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
-                  <Link href="https://github.com/neuralsentry" target="_blank">
-                    <Newspaper size={20} />
-                  </Link>
+                  <Newspaper size={20} />
                 </button>
                 <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
