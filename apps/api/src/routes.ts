@@ -3,7 +3,7 @@ import { Router } from "express";
 import httpError from "http-errors";
 import httpStatus from "http-status";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { sql, and, lte, gte, eq } from "drizzle-orm";
+import { sql, and, lte, gte, eq, not } from "drizzle-orm";
 
 import { validate } from "@/shared/utils";
 import { client } from "@/shared/db/client";
@@ -16,22 +16,27 @@ const getCVEsSchema = z.object({
   query: z.object({
     limit: z.coerce.number().min(1).max(50).default(10),
     page: z.coerce.number().min(1).default(1),
-    num_lines: z.coerce.number().min(1).default(10)
+    num_lines: z.coerce.number().min(1).default(10),
+    include_code: z
+      .string()
+      .transform((v) => (v.length >= 0 ? true : false))
+      .optional()
   })
 });
 
 export const routes = Router()
   .get("/cves", async (req, res) => {
     const {
-      query: { limit, page, num_lines }
+      query: { limit, page, num_lines, include_code }
     } = await validate(getCVEsSchema, req);
 
     const cves = await db.query.cve.findMany({
       with: {
         funcs: {
+          columns: include_code ? undefined : { code: false },
           with: {
             model_predictions: {
-              where: eq(modelPrediction.model_id, 1)
+              // where: eq(modelPrediction.model_id, 1)
             }
           },
           where: lte(func.num_lines, num_lines)
@@ -42,6 +47,27 @@ export const routes = Router()
     });
 
     res.json({ meta: { count: cves.length }, data: cves });
+  })
+  .get("/cves/count", async (req, res) => {
+    const data = await db
+      .select({
+        count: sql`count(*)`.mapWith(Number)
+      })
+      .from(schema.cve);
+    const count = data[0].count;
+    res.json({ data: { count } });
+  })
+  .get("/non-vulnerable-functions-count", async (req, res) => {
+    const data = await db
+      .select({
+        count: sql`count(*)`.mapWith(Number)
+      })
+      .from(schema.func)
+      .where(not(eq(schema.func.labels, 1)));
+
+    const count = data[0].count;
+
+    res.json({ data: { count } });
   })
   .get("/functions", async (req, res) => {
     const randomise = typeof req.query.randomise === "string";
@@ -95,7 +121,7 @@ export const routes = Router()
     }
 
     const funcs = await db.query.func.findMany({
-      with: { cve: true, modelPredictions: true },
+      with: { cve: true, model_predictions: true },
       limit: limitInt,
       offset: offsetInt,
       orderBy: randomise ? sql`random()` : sql`id`,
