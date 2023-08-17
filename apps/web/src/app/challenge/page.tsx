@@ -465,8 +465,8 @@ export default function Start() {
               the other hand, humans are{" "}
               <span className="font-bold text-error">slow</span>,{" "}
               <span className="font-bold text-error">inaccurate</span>, and
-              require{" "}
-              <span className="font-bold text-error">advanced expertise</span>.
+              requires{" "}
+              <span className="font-bold text-error">adequate experience</span>.
             </p>
           </section>
 
