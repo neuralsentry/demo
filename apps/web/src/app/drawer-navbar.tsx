@@ -121,7 +121,7 @@ export function DrawerNavbar({ children }: Props) {
             </div>
           </div>
 
-          <div className="pt-2 m-0 divider bg-base-100 h-0 relative z-10"></div>
+          <div className="pt-2 m-0 divider bg-base-100 h-0 relative z-50"></div>
           {children}
         </div>
       </div>
