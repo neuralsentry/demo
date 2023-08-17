@@ -10,20 +10,6 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { axios } from "@/shared/axios";
 import { CodeBlock } from "@/app/challenge/components/code-block";
 
-async function getFunctions() {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/functions`);
-  url.searchParams.append("limit", "10");
-  const res = await fetch(url.toString(), {
-    cache: "no-cache"
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch functions");
-  }
-
-  return res.json();
-}
-
 async function getCVEs(
   limit = 10,
   page = 1,
@@ -241,7 +227,10 @@ export function CVEsTable() {
                           href={`https://nvd.nist.gov/vuln/detail/${cve.name}`}
                           target="_blank"
                         >
-                          <ExternalLink className="indicator-item z-[-10]" size={14} />
+                          <ExternalLink
+                            className="indicator-item z-[-10]"
+                            size={14}
+                          />
                           <span className="pr-2">{cve.name}</span>
                         </a>
                       </div>

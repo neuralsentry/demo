@@ -125,7 +125,7 @@ export function DrawerNavbar({ children }: Props) {
           {children}
         </div>
       </div>
-      <div className="drawer-side">
+      <div className="drawer-side z-50">
         <label htmlFor="mobile-drawer" className="drawer-overlay"></label>
         <ul className="menu p-4 w-80 h-full bg-base-100 border-r border-base-300">
           <li>
