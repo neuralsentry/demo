@@ -204,22 +204,32 @@ export default function Start() {
   return (
     <main className="mb-20">
       <dialog id="help_modal" className="modal w-full">
-        <form method="dialog" className="modal-box max-w-lg w-full">
-          <h3 className="font-bold text-xl">Instructions</h3>
-          <section className="py-4 flex gap-y-4 flex-col">
+        <form
+          method="dialog"
+          className="modal-box max-w-lg w-full max-h-[600px] border border-base-200"
+        >
+          <h3 className="font-bold text-4xl text-center">Welcome!</h3>
+          <section className="py-4 mt-2 flex gap-y-4 flex-col text-justify">
+            <h4 className="font-bold text-xl text-center">Instructions</h4>
             <p>
-              You will be given 10 C/C++ functions, where some are vulnerable
-              and some are not.
+              You will be given <span className="font-bold">10</span> C/C++
+              functions, where some are{" "}
+              <span className="text-error font-bold">vulnerable</span> and some
+              are <span className="text-success font-bold">not vulnerable</span>
+              .
             </p>
             <p>
               Try to correctly classify as many functions as possible within the
-              30s time limit.
+              <span className="font-bold"> 30s</span> time limit.
             </p>
             <p>
-              You also have a strong competitor! Our AI model will also try to
-              classify the functions. You can see yours and the AI's progress
-              below:
+              You have strong competitors and will be put against AI models
+              trained by us!
             </p>
+            <p>You can see your progress during the quiz.</p>
+            <h4 className="text-center text-sm font-light">
+              For desktop users
+            </h4>
             <Image
               className="rounded-xl border border-gray-700 shadow-xl"
               src="/progress-indicator.png"
@@ -227,9 +237,27 @@ export default function Start() {
               height={200}
               alt="Progress indicator"
             />
+            <h4 className="text-center text-sm font-light">
+              For mobile users, click the blue arrow button.
+            </h4>
+            <Image
+              className="rounded-xl border border-gray-700 shadow-xl"
+              src="/mobile-progress-indicator.png"
+              width={600}
+              height={200}
+              alt="Progress indicator"
+            />
+          </section>
+
+          <section className="py-4 mt-2 flex gap-y-4 flex-col text-justify">
+            <h4 className="font-bold text-xl text-center">
+              That's All, Good Luck!
+            </h4>
             <p>
-              Press ESC key or click the button below to close. Then, you may
-              click the start button to begin the timer.
+              When you're ready, press the{" "}
+              <kbd className="align-middle kbd kbd-xs">ESC</kbd> key or click
+              the button below to close. Then, you can click the start button to
+              begin the timer.
             </p>
           </section>
           <div className="modal-action">
@@ -243,7 +271,7 @@ export default function Start() {
       <dialog id="quiz_complete_modal" className="modal w-full pt-5 sm:pt-0">
         <form
           method="dialog"
-          className="modal-box max-w-lg w-full pb-16 sm:pb-0"
+          className="modal-box max-w-lg w-full max-h-[600px] sm:pb-0 border border-base-200"
         >
           <h3 className="font-bold text-5xl text-center text-secondary">
             {miliseconds === 0 ? "Time's up!" : "Challenge Completed!"}
