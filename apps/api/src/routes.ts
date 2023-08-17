@@ -30,7 +30,7 @@ export const routes = Router()
       with: {
         funcs: {
           with: {
-            modelPredictions: {
+            model_predictions: {
               where: eq(modelPrediction.model_id, 1)
             }
           },

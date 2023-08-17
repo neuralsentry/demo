@@ -41,7 +41,7 @@ export const funcRelations = relations(func, ({ one, many }) => ({
     fields: [func.cve_name],
     references: [cve.name]
   }),
-  modelPredictions: many(modelPrediction)
+  model_predictions: many(modelPrediction)
 }));
 
 export type Func = InferModel<typeof func>;
