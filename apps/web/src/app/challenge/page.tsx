@@ -548,16 +548,34 @@ export default function Start() {
 
       <div className="mt-5">
         {funcs.isLoading ? (
-          <div className="h-[240px] w-full bg-base-200 bg-opacity-20 flex justify-center items-center">
+          <div className="h-[256px] w-full bg-base-200 bg-opacity-40 flex justify-center items-center">
             Loading ...
           </div>
         ) : funcs.isSuccess ? (
-          <CodeBlock
-            code={funcs.data[
-              userAnswers.length > 9 ? 9 : userAnswers.length
-            ].code.trim()}
-            language="cpp"
-          />
+          <div className="relative overflow-hidden">
+            <CodeBlock
+              className={clsx(!isStarted && "blur-sm")}
+              code={funcs.data[
+                userAnswers.length > 9 ? 9 : userAnswers.length
+              ].code.trim()}
+              language="cpp"
+            />
+            <div
+              className={clsx(
+                "absolute top-0 h-full w-full bg-black bg-opacity-80 flex justify-center items-center",
+                isStarted && !isComplete && "hidden"
+              )}
+            >
+              <button
+                className={clsx("btn btn-secondary btn-wide")}
+                onClick={
+                  isComplete ? () => window.location.reload() : handleStartClick
+                }
+              >
+                {isComplete ? "Restart" : "Start"}
+              </button>
+            </div>
+          </div>
         ) : (
           <div>Failed to load functions</div>
         )}
@@ -757,21 +775,15 @@ export default function Start() {
         </div>
 
         <button
-          className={clsx(
-            "mt-10 btn btn-primary w-full",
-            !isStarted && ["btn-secondary"],
-            isComplete && ["btn-secondary"]
-          )}
-          onClick={
+          className={clsx("mt-10 btn btn-primary w-full")}
+          onClick={handleNextClick}
+          disabled={
+            !isStarted ||
+            (!isComplete && isStarted && choiceIndex === -1) ||
             isComplete
-              ? () => window.location.reload()
-              : isStarted
-              ? handleNextClick
-              : handleStartClick
           }
-          disabled={!isComplete && isStarted && choiceIndex === -1}
         >
-          {isComplete ? "Restart" : isStarted ? "Next" : "Start"}
+          Next
         </button>
       </div>
     </main>
