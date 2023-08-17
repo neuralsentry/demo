@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Github } from "lucide-react";
+import { ChevronDownIcon, Github, Newspaper } from "lucide-react";
 
 type Props = {
   children: React.ReactNode;
@@ -57,71 +57,135 @@ export function DrawerNavbar({ children }: Props) {
             </div>
 
             <div className="navbar-center hidden lg:flex">
-              <ul className="menu menu-horizontal gap-x-1">
+              <ul className="menu menu-horizontal gap-x-1 items-center">
                 <li>
                   <Link href="/">Home</Link>
                 </li>
-                <div className="dropdown dropdown-hover">
-                  <li>
-                    <Link href="/challenge">Challenge</Link>
-                  </li>
-                  <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 border-base-300 border rounded-box w-52">
-                    <li>
-                      <Link href="/leaderboard">Leaderboard</Link>
-                    </li>
-                    <li>
-                      <Link href="/ai">AI</Link>
-                    </li>
-                  </ul>
-                </div>
                 <li>
                   <Link href="/about">About</Link>
                 </li>
+                <div className="dropdown dropdown-hover">
+                  <li>
+                    <p className="group">
+                      Challenge
+                      <ChevronDownIcon className="transition-transform group-hover:rotate-180" />
+                    </p>
+                  </li>
+                  <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 border-base-300 border rounded-box w-52">
+                    <li>
+                      <Link href="/challenge" className="block">
+                        Play
+                        <span className="text-xs text-gray-500">
+                          <br />
+                          Try and beat AI models
+                        </span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/ai"
+                        onClick={() => setDrawer(false)}
+                        className="block"
+                      >
+                        Performance
+                        <span className="text-xs text-gray-500">
+                          <br />
+                          See the performance of AI
+                        </span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/ai/functions"
+                        onClick={() => setDrawer(false)}
+                        className="block"
+                      >
+                        Functions
+                        <span className="text-xs text-gray-500">
+                          <br />
+                          Predictions made by AI
+                        </span>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </ul>
             </div>
 
-            <div className="navbar-end gap-x-2 hidden lg:flex">
+            <div className="navbar-end gap-x-2 hidden lg:flex items-center">
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600">
-                  <Github size={20} />
+                  <Github size={20} strokeWidth={2.5} />
                 </button>
-                <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
+                <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
-                    <Link
-                      href="https://github.com/neuralsentry"
-                      target="_blank"
-                    >
-                      Homepage
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
+                    <a
                       href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
                       target="_blank"
+                      className="block"
                     >
-                      Commit Classifier
-                    </Link>
+                      Ai Commit Classifier
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Our AI models and datasets
+                      </span>
+                    </a>
                   </li>
                 </ul>
               </div>
 
-              <button className="btn btn-square btn-outline btn-sm border-neutral-600 hidden sm:flex">
-                <Link
-                  href="https://huggingface.co/neuralsentry"
-                  target="_blank"
-                >
+              <div className="dropdown dropdown-hover dropdown-end">
+                <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
                   <Image
                     src="/huggingface.svg"
                     alt="HuggingFace Logo"
                     width={29}
                     height={29}
                   />
-                </Link>
-              </button>
+                </button>
+                <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
+                  <li>
+                    <a
+                      href="https://huggingface.co/neuralsentry"
+                      target="_blank"
+                      className="block"
+                    >
+                      HuggingFace
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Our AI models and datasets
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="dropdown dropdown-hover dropdown-end">
+                <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
+                  <Link href="https://github.com/neuralsentry" target="_blank">
+                    <Newspaper size={20} />
+                  </Link>
+                </button>
+                <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
+                  <li>
+                    <a
+                      href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
+                      target="_blank"
+                      className="block"
+                    >
+                      Google Drive
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        Our Academic Report
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          <div className="pt-2 m-0 divider bg-base-100 h-0 relative z-50"></div>
+          <div className="pt-2 m-0 divider bg-base-100 h-0 relative z-20"></div>
           {children}
         </div>
       </div>
