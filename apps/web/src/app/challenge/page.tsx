@@ -490,12 +490,9 @@ export default function Start() {
             </p>
             <p>
               Click the button below to learn more! Or, better yet, come on down
-              to{" "}
-              <Link href="/public" target="_blank">
-                <span className="font-bold text-secondary">T2033</span>
-                <span className="text-xs text-gray-600 ml-1">(3A67)</span>
-              </Link>{" "}
-              so we can answer your questions in person!
+              to <span className="font-bold">T2033</span>
+              <span className="text-xs text-gray-600 ml-1">(3A67)</span> so we
+              can answer your questions in person!
             </p>
           </section>
 
