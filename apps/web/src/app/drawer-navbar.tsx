@@ -22,8 +22,8 @@ export function DrawerNavbar({ children }: Props) {
         onChange={() => setDrawer(!drawer)}
       />
       <div className="drawer-content">
-        <div className="sm:px-4 xl:max-w-6xl mx-auto w-screen">
-          <div className="navbar">
+        <div className="sm:px-4 xl:max-w-6xl mx-auto w-screen static">
+          <div className="navbar bg-base-100 relative z-50">
             <div className="navbar-start">
               <div className="flex-none lg:hidden">
                 <label
@@ -121,7 +121,7 @@ export function DrawerNavbar({ children }: Props) {
             </div>
           </div>
 
-          <div className="p-0 m-0 divider"></div>
+          <div className="pt-2 m-0 divider bg-base-100 h-0 relative z-50"></div>
           {children}
         </div>
       </div>

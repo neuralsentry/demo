@@ -343,7 +343,7 @@ export default function Start() {
           "flex flex-col-reverse md:flex-row justify-center items-center mx-auto mt-0 md:mt-4 gap-x-10",
           "fixed top-0 left-2/4 transform -translate-x-2/4 z-10 md:relative rounded-b-xl border border-t-0 border-gray-500",
           "bg-base-100 md:bg-inherit px-4 py-2 md:p-0 w-full max-w-sm  md:max-w-full",
-          "transition-transform duration-500 ease-in-out",
+          "transition-transform duration-500 ease-in-out z-10",
           !displayProgress && "-translate-y-[200px] md:translate-y-0"
         )}
       >
@@ -355,7 +355,7 @@ export default function Start() {
             size={30}
             className={clsx(
               "transition-transform duration-500 ease-in-out",
-              !displayProgress && "rotate-180"
+              displayProgress && "rotate-180"
             )}
           />
         </button>
