@@ -8,8 +8,8 @@ export default function Home() {
           Are you up for a <span className="text-secondary">challenge</span>?
         </h1>
         <p className="py-6 mt-2 max-w-[40ch] md:max-w-[50ch] lg:max-w-[60ch]">
-          Test your skills and see if you can detect more vulnerable C/C++
-          functions than our Artificial Intelligence (AI) model.
+          Test your skills and see if you can beat our Artificial Intelligence
+          (AI) models in detecting vulnerabilities.
         </p>
         <div className="mt-10 gap-x-5">
           <Link href="/challenge">

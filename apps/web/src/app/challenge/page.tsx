@@ -277,9 +277,9 @@ export default function Start() {
             {miliseconds === 0 ? "Time's up!" : "Challenge Completed!"}
           </h3>
 
-          <p className="mt-6">
-            You have completed the challenge. Don't worry if you didn't get a
-            good score!
+          <p className="mt-6 text-justify">
+            Don't worry if you didn't get a good score! This challenge is
+            designed to be difficult.
           </p>
 
           <section className="mt-4 flex flex-col items-center pb-4 border rounded-lg px-4 border-base-200">
@@ -487,7 +487,8 @@ export default function Start() {
               so we can answer your questions in person!
             </p>
           </section>
-          <div className="mt-5 modal-action justify-between">
+
+          <div className="mt-5 pb-4 modal-action justify-between">
             <button className="btn">Close</button>
             <Link href="/about" className="btn btn-primary">
               Learn more
