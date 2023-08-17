@@ -1,3 +1,4 @@
+import cors from "cors";
 import morgan from "morgan";
 import express from "express";
 import httpError from "http-errors";
@@ -26,7 +27,12 @@ export function main() {
   app.use(morgan("dev"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(limiter);
+  // app.use(limiter);
+  app.use(
+    cors({
+      origin: "*"
+    })
+  );
 
   app.use("/api", routes);
 
