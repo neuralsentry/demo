@@ -143,6 +143,16 @@ export function DrawerNavbar({ children }: Props) {
               </li>
 
               <li>
+                <Link href="/about" onClick={() => setDrawer(false)}>
+                  About
+                </Link>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <h2 className="menu-title">Challenge</h2>
+            <ul>
+              <li>
                 <Link href="/leaderboard" onClick={() => setDrawer(false)}>
                   Leaderboard
                 </Link>
@@ -150,11 +160,6 @@ export function DrawerNavbar({ children }: Props) {
               <li>
                 <Link href="/vulnerabilities" onClick={() => setDrawer(false)}>
                   Vulnerabilities
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" onClick={() => setDrawer(false)}>
-                  About
                 </Link>
               </li>
             </ul>
