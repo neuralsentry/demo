@@ -127,24 +127,42 @@ export function DrawerNavbar({ children }: Props) {
       </div>
       <div className="drawer-side z-50">
         <label htmlFor="mobile-drawer" className="drawer-overlay"></label>
-        <ul className="menu p-4 w-80 h-full bg-base-100 border-r border-base-300">
+        <ul className="menu p-4 w-80 overflow-y-auto flex-nowrap h-full bg-base-100 border-r border-base-300">
           <li>
             <h2 className="menu-title">Main</h2>
             <ul>
               <li>
-                <Link href="/" onClick={() => setDrawer(false)}>
+                <Link
+                  href="/"
+                  onClick={() => setDrawer(false)}
+                  className="block"
+                >
                   Home
+                  <br />
+                  <span className="text-xs text-gray-500">
+                    This is home, truly{" "}
+                    <Image
+                      className="inline-block align-middle"
+                      src="/sg.svg"
+                      width={12}
+                      height={12}
+                      alt="Singapore flag"
+                    />{" "}
+                    .
+                  </span>
                 </Link>
               </li>
               <li>
-                <Link href="/challenge" onClick={() => setDrawer(false)}>
-                  Challenge
-                </Link>
-              </li>
-
-              <li>
-                <Link href="/about" onClick={() => setDrawer(false)}>
-                  About
+                <Link
+                  href="/about"
+                  onClick={() => setDrawer(false)}
+                  className="block"
+                >
+                  About{" "}
+                  <span className="text-xs text-gray-500">
+                    <br />
+                    Learn more about our project
+                  </span>
                 </Link>
               </li>
             </ul>
@@ -153,13 +171,42 @@ export function DrawerNavbar({ children }: Props) {
             <h2 className="menu-title">Challenge</h2>
             <ul>
               <li>
-                <Link href="/leaderboard" onClick={() => setDrawer(false)}>
-                  Leaderboard
+                <Link
+                  href="/challenge"
+                  onClick={() => setDrawer(false)}
+                  className="block"
+                >
+                  Play
+                  <span className="text-xs text-gray-500">
+                    <br />
+                    Try and beat AI models
+                  </span>
                 </Link>
               </li>
               <li>
-                <Link href="/ai" onClick={() => setDrawer(false)}>
-                  AI
+                <Link
+                  href="/ai"
+                  onClick={() => setDrawer(false)}
+                  className="block"
+                >
+                  Performance
+                  <span className="text-xs text-gray-500">
+                    <br />
+                    See the performance of AI
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ai"
+                  onClick={() => setDrawer(false)}
+                  className="block"
+                >
+                  Functions
+                  <span className="text-xs text-gray-500">
+                    <br />
+                    Predictions made by AI
+                  </span>
                 </Link>
               </li>
             </ul>
@@ -168,21 +215,42 @@ export function DrawerNavbar({ children }: Props) {
             <h2 className="menu-title">Our Work</h2>
             <ul>
               <li>
-                <a href="https://github.com/neuralsentry" target="_blank">
-                  GitHub
+                <a
+                  href="https://huggingface.co/neuralsentry"
+                  target="_blank"
+                  className="block"
+                >
+                  HuggingFace
+                  <br />
+                  <span className="text-xs text-gray-500">
+                    Our AI models and datasets
+                  </span>
                 </a>
               </li>
               <li>
                 <a
                   href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
                   target="_blank"
+                  className="block"
                 >
                   AI Commit Classifier
+                  <br />
+                  <span className="text-xs text-gray-500">
+                    Easy-to-use CLI for commit classification
+                  </span>
                 </a>
               </li>
               <li>
-                <a href="https://huggingface.co/neuralsentry" target="_blank">
-                  HuggingFace
+                <a
+                  href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
+                  target="_blank"
+                  className="block"
+                >
+                  Report
+                  <br />
+                  <span className="text-xs text-gray-500">
+                    Our Academic Report
+                  </span>
                 </a>
               </li>
             </ul>
