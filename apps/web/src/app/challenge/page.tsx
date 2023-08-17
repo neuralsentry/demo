@@ -3,15 +3,15 @@
 import { clsx } from "clsx";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDownCircle, Info } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useInterval, useLocalStorage } from "usehooks-ts";
-
-import { CodeBlock } from "./components/code-block";
-import { ProgressIndicator } from "./components/progress-indicator.component";
-import { axios } from "@/shared/axios";
-import { Func } from "../ai/components/cves-table";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronDownCircle, Info } from "lucide-react";
+import { useInterval, useLocalStorage } from "usehooks-ts";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { axios } from "@/shared/axios";
+import { CodeBlock } from "./components/code-block";
+import { Func } from "../ai/functions/components/cves-table";
+import { ProgressIndicator } from "./components/progress-indicator.component";
 
 async function getFunctions(): Promise<Func[]> {
   const res = await axios.get("/functions", {
