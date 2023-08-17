@@ -22,7 +22,7 @@ export function DrawerNavbar({ children }: Props) {
         onChange={() => setDrawer(!drawer)}
       />
       <div className="drawer-content">
-        <div className="sm:px-4 xl:max-w-6xl mx-auto">
+        <div className="sm:px-4 xl:max-w-6xl mx-auto w-screen">
           <div className="navbar">
             <div className="navbar-start">
               <div className="flex-none lg:hidden">

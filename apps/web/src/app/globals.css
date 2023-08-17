@@ -5,3 +5,10 @@
 .btn {
   text-transform: none;
 }
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
