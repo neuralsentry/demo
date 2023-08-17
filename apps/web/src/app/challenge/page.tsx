@@ -4,11 +4,27 @@ import { clsx } from "clsx";
 import Link from "next/link";
 import Image from "next/image";
 import { Info } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useInterval, useLocalStorage } from "usehooks-ts";
 
 import { CodeBlock } from "./components/code-block";
 import { ProgressIndicator } from "./components/progress-indicator.component";
+import { axios } from "@/shared/axios";
+import { Func } from "../ai/components/cves-table";
+import { useQuery } from "@tanstack/react-query";
+
+async function getFunctions(): Promise<Func[]> {
+  const res = await axios.get("/functions", {
+    params: {
+      randomise: true,
+      limit: 10,
+      maxNumLines: 10,
+      minNumLines: 5
+    }
+  });
+
+  return res.data.data;
+}
 
 const headings = [
   "Hmmm, what about this one?",
@@ -28,55 +44,29 @@ type Question = {
   function: string;
   labels: number;
   cve?: string;
-  cve_description?: string;
 };
-
-const questions: Question[] = Array(10)
-  .fill(0)
-  .map((_, i) => ({
-    id: i + 1,
-    function: `void Browser::WorkerCrashed(WebContents* source) {
-  InfoBarTabHelper* infobar_helper =
-      InfoBarTabHelper::FromWebContents(source);
-  infobar_helper->AddInfoBar(new SimpleAlertInfoBarDelegate(
-      infobar_helper,
-      NULL,
-      l10n_util::GetStringUTF16(IDS_WEBWORKER_CRASHED_PROMPT),
-      true));
-}
-`,
-    labels: 1,
-    cve: "CVE-2021-21224",
-    cve_description: "Use after free in Blink"
-  }));
 
 type ModelQuestionPrediction = {
   id: number;
   question_id: number;
-  model: string;
-  description: string;
-  num_epochs: number;
-  eval_split: number;
-  revision: string;
-  model_url: string;
   prediction: number;
 };
 
-const modelQuestionPredictions: ModelQuestionPrediction[] = Array(10)
-  .fill(0)
-  .map((_, i) => ({
-    id: i + 1,
-    question_id: i + 1,
-    model: "StarEncoder",
-    description:
-      "StarEncoder model trained on a balanced dataset of 71,214 functions from 508 different C/C++ projects.",
-    num_epochs: 10,
-    eval_split: 0.1,
-    revision: "61806c08f5760d5c21d3dcafc7a81f0e55561f19",
-    model_url:
-      "https://huggingface.co/neuralsentry/vulnerabilityDetection-StarEncoder-BigvulCvefixesDevignReveal",
-    prediction: Math.random() > 0.7 ? 1 : 0
-  }));
+// const modelQuestionPredictions: ModelQuestionPrediction[] = Array(10)
+//   .fill(0)
+//   .map((_, i) => ({
+//     id: i + 1,
+//     question_id: i + 1,
+//     model: "StarEncoder",
+//     description:
+//       "StarEncoder model trained on a balanced dataset of 71,214 functions from 508 different C/C++ projects.",
+//     num_epochs: 10,
+//     eval_split: 0.1,
+//     revision: "61806c08f5760d5c21d3dcafc7a81f0e55561f19",
+//     model_url:
+//       "https://huggingface.co/neuralsentry/vulnerabilityDetection-StarEncoder-BigvulCvefixesDevignReveal",
+//     prediction: Math.random() > 0.7 ? 1 : 0
+//   }));
 
 const cpuIterationsPerSecond = 1;
 const gpuIterationsPerSecond = 70;
@@ -90,15 +80,18 @@ export default function Start() {
   const [isStarted, setIsStarted] = useState(false);
   const [displayHelp, setDisplayHelp] = useLocalStorage("displayHelp", true);
 
+  const funcs = useQuery({ queryKey: ["functions"], queryFn: getFunctions });
+
   const handleStartClick = () => {
     setIsStarted(true);
   };
 
   const incorrectUserAnswerIndexes = useMemo(
     () =>
+      funcs.isSuccess &&
       userAnswers.reduce((acc, answer, i) => {
-        const question = questions[i];
-        if (answer === question.labels) {
+        const func = funcs.data[i];
+        if (answer === func.labels) {
           return acc;
         }
         return [...acc, i];
@@ -191,6 +184,19 @@ export default function Start() {
       (window as any).quiz_complete_modal?.showModal();
     }
   }, [isComplete]);
+
+  const getModelPredictionErrorIndexes = useCallback(
+    (modelPredictions: number[], labels: number[]) => {
+      return modelPredictions.reduce((acc, prediction, i) => {
+        console.log(prediction, labels[i]);
+        if (prediction === labels[i]) {
+          return acc;
+        }
+        return [...acc, i];
+      }, [] as number[]);
+    },
+    [funcs.data]
+  );
 
   return (
     <main className="mb-10">
@@ -288,7 +294,7 @@ export default function Start() {
               )}
             </span>
             <span className="text-xl text-gray-500">
-              / {questions.length} Questions
+              / {funcs?.data?.length} Questions
             </span>
           </h1>
         </div>
@@ -310,12 +316,23 @@ export default function Start() {
       </header>
 
       <div className="mt-5">
-        <CodeBlock code={questions[0]["function"]} language="cpp" />
+        {funcs.isLoading ? (
+          <div className="h-[240px] w-full bg-base-200 bg-opacity-20 flex justify-center items-center">
+            Loading ...
+          </div>
+        ) : funcs.isSuccess ? (
+          <CodeBlock
+            code={funcs.data[userAnswers.length].code}
+            language="cpp"
+          />
+        ) : (
+          <div>Failed to load functions</div>
+        )}
       </div>
 
-      <div className="flex items-start justify-center mx-auto mt-10 gap-x-10">
+      <div className="flex justify-center items-center mx-auto mt-4 gap-x-10">
         <div
-          className="grid items-center mt-5 gap-x-7"
+          className="grid items-center gap-x-7"
           style={{
             gridTemplateColumns: "minmax(0, max-content) minmax(0, 1fr)"
           }}
@@ -324,57 +341,134 @@ export default function Start() {
           <ProgressIndicator
             total={10}
             current={userAnswers.length}
-            errorIndexes={incorrectUserAnswerIndexes}
+            errorIndexes={incorrectUserAnswerIndexes || []}
           />
         </div>
 
         <div className="divider divider-horizontal">vs</div>
 
         <div
-          className="grid items-center mt-5 gap-x-7"
+          className="grid items-center gap-x-7"
           style={{
             gridTemplateColumns: "minmax(0, max-content) minmax(0, 1fr)"
           }}
         >
           <div className="indicator">
             <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
-              <div
-                className="tooltip"
-                data-tip={`Ryzen 5 5600X, ${cpuIterationsPerSecond} iteration/s`}
-              >
+              <div className="tooltip" data-tip={"Trained on 30,000 functions"}>
                 <Info size={14} strokeWidth={3} />
               </div>
             </span>
             <p>
-              AI <span className="text-xs text-gray-500">CPU</span>
+              AI <span className="text-xs text-gray-500">V1, CPU</span>
             </p>
           </div>
           <ProgressIndicator
             total={10}
             current={CPUCurrent}
-            errorIndexes={modelQuestionPredictions
-              .filter((p) => p.prediction === 1)
-              .map((p) => p.question_id)}
+            errorIndexes={
+              funcs.isSuccess
+                ? getModelPredictionErrorIndexes(
+                    funcs.data.reduce((acc, func) => {
+                      const prediction = (
+                        func.model_predictions.find(
+                          (p) => p.model_id == 1
+                        ) as any
+                      ).prediction;
+                      return [...acc, prediction];
+                    }, [] as number[]),
+                    funcs.data.map((f) => f.labels)
+                  )
+                : []
+            }
           />
           <div className="indicator">
             <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
-              <div
-                className="tooltip"
-                data-tip={`NVIDIA GeForce RTX 3070 Ti, ${gpuIterationsPerSecond} iteration/s`}
-              >
+              <div className="tooltip" data-tip={"Trained on 30,000 functions"}>
                 <Info size={14} strokeWidth={3} />
               </div>
             </span>
             <p>
-              AI <span className="text-xs text-gray-500">GPU</span>
+              AI <span className="text-xs text-gray-500">V1, GPU</span>
             </p>
           </div>
           <ProgressIndicator
             total={10}
             current={GPUCurrent}
-            errorIndexes={modelQuestionPredictions
-              .filter((p) => p.prediction === 1)
-              .map((p) => p.question_id)}
+            errorIndexes={
+              funcs.isSuccess
+                ? getModelPredictionErrorIndexes(
+                    funcs.data.reduce((acc, func) => {
+                      const prediction = (
+                        func.model_predictions.find(
+                          (p) => p.model_id == 1
+                        ) as any
+                      ).prediction;
+                      return [...acc, prediction];
+                    }, [] as number[]),
+                    funcs.data.map((f) => f.labels)
+                  )
+                : []
+            }
+          />
+
+          <div className="indicator">
+            <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+              <div className="tooltip" data-tip={"Trained on 70,000 functions"}>
+                <Info size={14} strokeWidth={3} />
+              </div>
+            </span>
+            <p>
+              AI <span className="text-xs text-gray-500">V2, GPU</span>
+            </p>
+          </div>
+          <ProgressIndicator
+            total={10}
+            current={CPUCurrent}
+            errorIndexes={
+              funcs.isSuccess
+                ? getModelPredictionErrorIndexes(
+                    funcs.data.reduce((acc, func) => {
+                      const prediction = (
+                        func.model_predictions.find(
+                          (p) => p.model_id == 2
+                        ) as any
+                      ).prediction;
+                      return [...acc, prediction];
+                    }, [] as number[]),
+                    funcs.data.map((f) => f.labels)
+                  )
+                : []
+            }
+          />
+          <div className="indicator">
+            <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+              <div className="tooltip" data-tip={"Trained on 70,000 functions"}>
+                <Info size={14} strokeWidth={3} />
+              </div>
+            </span>
+            <p>
+              AI <span className="text-xs text-gray-500">V2, GPU</span>
+            </p>
+          </div>
+          <ProgressIndicator
+            total={10}
+            current={GPUCurrent}
+            errorIndexes={
+              funcs.isSuccess
+                ? getModelPredictionErrorIndexes(
+                    funcs.data.reduce((acc, func) => {
+                      const prediction = (
+                        func.model_predictions.find(
+                          (p) => p.model_id == 2
+                        ) as any
+                      ).prediction;
+                      return [...acc, prediction];
+                    }, [] as number[]),
+                    funcs.data.map((f) => f.labels)
+                  )
+                : []
+            }
           />
         </div>
       </div>
