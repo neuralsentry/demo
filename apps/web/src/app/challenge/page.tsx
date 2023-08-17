@@ -201,10 +201,6 @@ export default function Start() {
     [funcs.data]
   );
 
-  useEffect(() => {
-    console.log(userAnswers);
-  }, [userAnswers]);
-
   return (
     <main className="mb-20">
       <dialog id="help_modal" className="modal w-full">
@@ -244,38 +240,226 @@ export default function Start() {
         </form>
       </dialog>
 
-      <dialog id="quiz_complete_modal" className="modal w-full">
-        <form method="dialog" className="modal-box max-w-lg w-full">
+      <dialog id="quiz_complete_modal" className="modal w-full pt-5 sm:pt-0">
+        <form
+          method="dialog"
+          className="modal-box max-w-lg w-full pb-16 sm:pb-0"
+        >
           <h3 className="font-bold text-5xl text-center text-secondary">
-            {miliseconds === 0 ? "Time's up!" : "Quiz complete!"}
+            {miliseconds === 0 ? "Time's up!" : "Challenge Completed!"}
           </h3>
-          <section className="py-4 flex gap-y-4 flex-col text-justify">
+
+          <p className="mt-6">
+            You have completed the challenge. Don't worry if you didn't get a
+            good score!
+          </p>
+
+          <section className="mt-4 flex flex-col items-center pb-4 border rounded-lg px-4 border-base-200">
+            <p className="mt-4 text-lg  text-center">
+              <span className="font-semibold">Progress </span>
+              <span className="text-xs text-gray-500">(Correct / Total)</span>
+            </p>
+            <div
+              className="mt-2 grid items-center gap-x-7"
+              style={{
+                gridTemplateColumns: "minmax(0, max-content) minmax(0, 1fr)"
+              }}
+            >
+              <p className="font-bold">You</p>
+              <ProgressIndicator
+                total={10}
+                current={userAnswers.length}
+                errorIndexes={incorrectUserAnswerIndexes || []}
+              />
+            </div>
+            <div className="divider max-w-sm mx-auto w-full">vs</div>
+            <div
+              className="grid items-center gap-x-7"
+              style={{
+                gridTemplateColumns: "minmax(0, max-content) minmax(0, 1fr)"
+              }}
+            >
+              <div className="indicator">
+                <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+                  <div
+                    className="tooltip"
+                    data-tip={"Trained on 30,000 functions"}
+                  >
+                    <Info size={14} strokeWidth={3} />
+                  </div>
+                </span>
+                <p>
+                  AI <span className="text-xs text-gray-500">V1, CPU</span>
+                </p>
+              </div>
+              <ProgressIndicator
+                total={10}
+                current={CPUCurrent}
+                errorIndexes={
+                  funcs.isSuccess
+                    ? getModelPredictionErrorIndexes(
+                        funcs.data.reduce((acc, func) => {
+                          const prediction = (
+                            func.model_predictions.find(
+                              (p) => p.model_id == 1
+                            ) as any
+                          ).prediction;
+                          return [...acc, prediction];
+                        }, [] as number[]),
+                        funcs.data.map((f) => f.labels)
+                      )
+                    : []
+                }
+              />
+              <div className="indicator">
+                <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+                  <div
+                    className="tooltip"
+                    data-tip={"Trained on 30,000 functions"}
+                  >
+                    <Info size={14} strokeWidth={3} />
+                  </div>
+                </span>
+                <p>
+                  AI <span className="text-xs text-gray-500">V1, GPU</span>
+                </p>
+              </div>
+              <ProgressIndicator
+                total={10}
+                current={GPUCurrent}
+                errorIndexes={
+                  funcs.isSuccess
+                    ? getModelPredictionErrorIndexes(
+                        funcs.data.reduce((acc, func) => {
+                          const prediction = (
+                            func.model_predictions.find(
+                              (p) => p.model_id == 1
+                            ) as any
+                          ).prediction;
+                          return [...acc, prediction];
+                        }, [] as number[]),
+                        funcs.data.map((f) => f.labels)
+                      )
+                    : []
+                }
+              />
+
+              <div className="indicator">
+                <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+                  <div
+                    className="tooltip"
+                    data-tip={"Trained on 70,000 functions"}
+                  >
+                    <Info size={14} strokeWidth={3} />
+                  </div>
+                </span>
+                <p>
+                  AI <span className="text-xs text-gray-500">V2, GPU</span>
+                </p>
+              </div>
+              <ProgressIndicator
+                total={10}
+                current={CPUCurrent}
+                errorIndexes={
+                  funcs.isSuccess
+                    ? getModelPredictionErrorIndexes(
+                        funcs.data.reduce((acc, func) => {
+                          const prediction = (
+                            func.model_predictions.find(
+                              (p) => p.model_id == 2
+                            ) as any
+                          ).prediction;
+                          return [...acc, prediction];
+                        }, [] as number[]),
+                        funcs.data.map((f) => f.labels)
+                      )
+                    : []
+                }
+              />
+              <div className="indicator">
+                <span className="text-gray-700 rounded-full hover:text-gray-600 indicator-item">
+                  <div
+                    className="tooltip"
+                    data-tip={"Trained on 70,000 functions"}
+                  >
+                    <Info size={14} strokeWidth={3} />
+                  </div>
+                </span>
+                <p>
+                  AI <span className="text-xs text-gray-500">V2, GPU</span>
+                </p>
+              </div>
+              <ProgressIndicator
+                total={10}
+                current={GPUCurrent}
+                errorIndexes={
+                  funcs.isSuccess
+                    ? getModelPredictionErrorIndexes(
+                        funcs.data.reduce((acc, func) => {
+                          const prediction = (
+                            func.model_predictions.find(
+                              (p) => p.model_id == 2
+                            ) as any
+                          ).prediction;
+                          return [...acc, prediction];
+                        }, [] as number[]),
+                        funcs.data.map((f) => f.labels)
+                      )
+                    : []
+                }
+              />
+            </div>
+          </section>
+
+          <section className="mt-4 py-4 flex gap-y-4 flex-col text-justify">
+            <h4 className="font-bold text-xl text-center">
+              What's This All About?
+            </h4>
             <p>
-              You have completed the challenge. Don't worry if you didn't get a
-              good score!
+              The purpose of this challenge is to demonstrate the effectiveness
+              of using AI to detect vulnerabilities.
             </p>
             <p>
-              The purpose of this challenge is actually to demonstrate the
-              effectiveness of using AI to detect vulnerabilities.
-            </p>
-            <p>
-              You may have noticed that the AI model is able to classify the
-              functions with{" "}
-              <span className="font-bold text-secondary">high accuracy</span>{" "}
-              and is <span className="font-bold text-secondary">very fast</span>
-              .
-            </p>
-            <p>
-              These models were trained as part of our research. However, this
-              is just a small portion of our research.
-            </p>{" "}
-            <p>
-              Click the button below to learn more! Or, better yet, come on down
-              to <span className="font-bold text-secondary ">T69 #2913</span> so
-              we can share more!
+              AI models are able to identify vulnerable functions with{" "}
+              <span className="font-bold text-success">high accuracy</span> and
+              are <span className="font-bold text-success">very fast</span>. On
+              the other hand, humans are{" "}
+              <span className="font-bold text-error">slow</span>,{" "}
+              <span className="font-bold text-error">inaccurate</span>, and
+              require{" "}
+              <span className="font-bold text-error">advanced expertise</span>.
             </p>
           </section>
-          <div className="modal-action justify-between">
+
+          <section className="mt-4 flex gap-y-4 flex-col text-justify">
+            <h4 className="font-bold text-xl text-center">
+              What is NeuralSentry's Goal?
+            </h4>
+            <p>
+              AI technology can revolutionise the software security industry by
+              enforcing more robust code. However, one huge problem with AI is
+              that it requires <span className="font-bold">a lot of data</span>{" "}
+              to be effective.
+            </p>
+
+            <p>
+              With that, in this project we researched the application of AI for{" "}
+              <span className="font-bold">dataset curation</span> and{" "}
+              <span className="font-bold">vulnerability detection</span>. The AI
+              models featured in this challenge is the culmination of our
+              research.
+            </p>
+            <p>
+              Click the button below to learn more! Or, better yet, come on down
+              to{" "}
+              <Link href="/public" target="_blank">
+                <span className="font-bold text-secondary">T2033</span>
+                <span className="text-xs text-gray-600 ml-1">(3A67)</span>
+              </Link>{" "}
+              so we can answer your questions in person!
+            </p>
+          </section>
+          <div className="mt-5 modal-action justify-between">
             <button className="btn">Close</button>
             <Link href="/about" className="btn btn-primary">
               Learn more
@@ -516,7 +700,7 @@ export default function Start() {
                   "border p-4 rounded-xl border-neutral",
                   isStarted && !isComplete
                     ? [
-                        "cursor-pointer bg-opacity-20",
+                        "cursor-pointer bg-opacity-40",
                         "hover:border-gray-500",
                         isActive && "bg-gray-700 border-gray-500"
                       ]
