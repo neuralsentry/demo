@@ -83,19 +83,6 @@ export function DrawerNavbar({ children }: Props) {
                     </li>
                     <li>
                       <Link
-                        href="/ai"
-                        onClick={() => setDrawer(false)}
-                        className="block"
-                      >
-                        Performance
-                        <span className="text-xs text-gray-500">
-                          <br />
-                          See the performance of AI
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
                         href="/ai/functions"
                         onClick={() => setDrawer(false)}
                         className="block"
@@ -115,7 +102,13 @@ export function DrawerNavbar({ children }: Props) {
             <div className="navbar-end gap-x-2 hidden lg:flex items-center">
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600">
-                  <Github size={20} strokeWidth={2.5} />
+                  <a
+                    href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
+                    target="_blank"
+                    className="block"
+                  >
+                    <Github size={20} strokeWidth={2.5} />
+                  </a>
                 </button>
                 <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
@@ -124,10 +117,10 @@ export function DrawerNavbar({ children }: Props) {
                       target="_blank"
                       className="block"
                     >
-                      Ai Commit Classifier
+                      NLP Commit Classifier
                       <br />
                       <span className="text-xs text-gray-500">
-                        Our AI models and datasets
+                        The tool utilising our AI NLP model
                       </span>
                     </a>
                   </li>
@@ -171,7 +164,7 @@ export function DrawerNavbar({ children }: Props) {
                       target="_blank"
                       className="block"
                     >
-                      Google Drive
+                      Report
                       <br />
                       <span className="text-xs text-gray-500">
                         Our Academic Report
@@ -247,19 +240,6 @@ export function DrawerNavbar({ children }: Props) {
               </li>
               <li>
                 <Link
-                  href="/ai"
-                  onClick={() => setDrawer(false)}
-                  className="block"
-                >
-                  Performance
-                  <span className="text-xs text-gray-500">
-                    <br />
-                    See the performance of AI
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/ai/functions"
                   onClick={() => setDrawer(false)}
                   className="block"
@@ -298,7 +278,7 @@ export function DrawerNavbar({ children }: Props) {
                   AI Commit Classifier
                   <br />
                   <span className="text-xs text-gray-500">
-                    Easy-to-use CLI for commit classification
+                    The tool utilising our AI NLP model
                   </span>
                 </a>
               </li>
