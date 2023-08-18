@@ -56,7 +56,7 @@ export function NonVulnerableTable() {
     setPage((prev) => prev - 1);
   }
 
-  const [perPage, setPerPage] = useState(2);
+  const [perPage, setPerPage] = useState(5);
 
   const [delay, setDelay] = useLocalStorage("delay", 1500);
 
@@ -107,7 +107,7 @@ export function NonVulnerableTable() {
           <div>
             <select
               className="select select-bordered join-item select-sm"
-              defaultValue="2"
+              defaultValue="5"
             >
               <option>2</option>
               <option>5</option>

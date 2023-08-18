@@ -121,7 +121,7 @@ export function CVEsTable() {
   }, [page]);
 
   const [itemsPerPage, setItemsPerPage] = useState(
-    Number(searchParams.get("itemsPerPage")) || 2
+    Number(searchParams.get("itemsPerPage")) || 5
   );
 
   const handleItemsPerPage = useCallback(
@@ -204,7 +204,7 @@ export function CVEsTable() {
           <div>
             <select
               className="select select-bordered join-item select-sm"
-              defaultValue="2"
+              defaultValue="5"
               onChange={(e) => {
                 setItemsPerPage(+e.target.value);
               }}
