@@ -129,12 +129,18 @@ export function DrawerNavbar({ children }: Props) {
 
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
-                  <Image
-                    src="/huggingface.svg"
-                    alt="HuggingFace Logo"
-                    width={29}
-                    height={29}
-                  />
+                  <a
+                    href="https://huggingface.co/neuralsentry"
+                    target="_blank"
+                    className="block"
+                  >
+                    <Image
+                      src="/huggingface.svg"
+                      alt="HuggingFace Logo"
+                      width={29}
+                      height={29}
+                    />
+                  </a>
                 </button>
                 <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
@@ -155,7 +161,13 @@ export function DrawerNavbar({ children }: Props) {
 
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
-                  <Newspaper size={20} />
+                  <a
+                    href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
+                    target="_blank"
+                    className="block"
+                  >
+                    <Newspaper size={20} />
+                  </a>
                 </button>
                 <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
