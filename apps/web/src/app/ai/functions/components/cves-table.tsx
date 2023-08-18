@@ -353,9 +353,7 @@ export function CVEsTable() {
                             ? "bg-warning text-black"
                             : "badge-error"
                         )}
-                      >
-                        {cve.severity}
-                      </div>
+                      ></div>
                     </td>
                     <td>
                       <button
