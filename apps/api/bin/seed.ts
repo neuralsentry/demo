@@ -23,9 +23,7 @@ async function main() {
     await fs.readFile("./bin/model_predictions.json", "utf-8")
   );
 
-  await db
-    .insert(cve)
-    .values(cves.map(({ cve, ...c }) => ({ ...c, name: cve })));
+  await db.insert(cve).values(cves);
   await db
     .insert(func)
     .values(

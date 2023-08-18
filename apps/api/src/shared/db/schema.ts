@@ -6,7 +6,7 @@ import {
   smallint,
   integer,
   real,
-  doublePrecision
+  doublePrecision,
 } from "drizzle-orm/pg-core";
 import { relations, InferModel } from "drizzle-orm";
 
@@ -14,7 +14,11 @@ export const cve = pgTable(
   "cve",
   {
     id: serial("id").primaryKey(),
-    name: text("name").notNull()
+    name: text("name").notNull(),
+    description: text("description"),
+    severity: text("severity"),
+    cvss2_base_score: real("cvss2_base_score"),
+    cvss3_base_score: real("cvss3_base_score")
   },
   (t) => ({
     name_idx: uniqueIndex("name_idx").on(t.name)
