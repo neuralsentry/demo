@@ -15,7 +15,8 @@ async function getCVEs(
   limit = 10,
   page = 1,
   includeCode = true,
-  search?: string
+  search?: string,
+  severity?: "LOW" | "MEDIUM" | "HIGH"
 ): Promise<CVE[]> {
   const res = await axios.get("/cves", {
     params: {
@@ -23,7 +24,8 @@ async function getCVEs(
       page,
       num_lines: 999_999, // get all functions
       include_code: includeCode ? "" : undefined,
-      search: search ?? undefined
+      search: search ?? undefined,
+      severity: severity ?? undefined
     }
   });
 
@@ -39,6 +41,10 @@ async function getCVEsCount(): Promise<number> {
 export type CVE = {
   id: number;
   name: string;
+  description?: string;
+  severity?: "LOW" | "MEDIUM" | "HIGH";
+  cvss_2_base_score?: number;
+  cvss_3_base_score?: number;
   funcs: Func[];
 };
 
@@ -64,11 +70,6 @@ export function CVEsTable() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
-  const debouncedSearch = useDebounce(search, 1.5 * 1000);
-  const isSearchLoading = useMemo(
-    () => debouncedSearch !== search,
-    [debouncedSearch, search]
-  );
 
   const handleSearch = useCallback(
     (search: string) => {
@@ -129,9 +130,20 @@ export function CVEsTable() {
     handleItemsPerPage(itemsPerPage);
   }, [itemsPerPage]);
 
+  const [severity, setSeverity] = useState("" as "LOW" | "MEDIUM" | "HIGH");
+  const debouncedValues = useDebounce(
+    { page, itemsPerPage, search, severity },
+    1500
+  );
+  const isSearchLoading = useMemo(
+    () => debouncedValues.search !== search,
+    [debouncedValues.search, search]
+  );
+
   const cves = useQuery({
-    queryKey: ["cves", page, itemsPerPage, debouncedSearch],
-    queryFn: async () => getCVEs(itemsPerPage, page, true, debouncedSearch),
+    queryKey: ["cves", page, itemsPerPage, debouncedValues.search, severity],
+    queryFn: async () =>
+      getCVEs(itemsPerPage, page, true, debouncedValues.search, severity),
     keepPreviousData: true,
     refetchOnWindowFocus: false
   });
@@ -142,24 +154,64 @@ export function CVEsTable() {
     refetchOnWindowFocus: false
   });
 
+  const isLoading = useMemo(
+    () =>
+      [
+        cves.isLoading,
+        count.isLoading,
+        debouncedValues.search !== search,
+        debouncedValues.severity !== severity
+      ].some(Boolean),
+    [
+      cves.isLoading,
+      count.isLoading,
+      debouncedValues.search,
+      debouncedValues.severity,
+      search,
+      severity
+    ]
+  );
+
   const [funcIndex, setFuncIndex] = useState(0);
 
   return (
     <div>
       <div className="mt-5 flex flex-col-reverse items-center gap-y-2 md:items-end md:flex-row md:justify-between">
-        <div>
-          <select
-            className="select select-bordered join-item select-sm"
-            defaultValue="2"
-            onChange={(e) => {
-              setItemsPerPage(+e.target.value);
-            }}
-          >
-            <option>2</option>
-            <option>5</option>
-            <option>10</option>
-          </select>
-          <span className="ml-2 text-sm text-gray-400">per page</span>
+        <div className="flex items-center gap-x-4">
+          <div>
+            <select
+              className="select select-bordered join-item select-sm"
+              defaultValue="2"
+              onChange={(e) => {
+                setItemsPerPage(+e.target.value);
+              }}
+            >
+              <option>2</option>
+              <option>5</option>
+              <option>10</option>
+            </select>
+            <span className="ml-2 text-sm text-gray-400">per page</span>
+          </div>
+
+          <div>
+            <select
+              className="select select-bordered join-item select-sm"
+              defaultValue="All"
+              onChange={(e) => {
+                setSeverity(
+                  e.target.value === "All"
+                    ? ""
+                    : (e.target.value.toUpperCase() as any)
+                );
+              }}
+            >
+              <option>All</option>
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </select>
+            <span className="ml-2 text-sm text-gray-400">Severity</span>
+          </div>
         </div>
 
         <div>
@@ -194,32 +246,35 @@ export function CVEsTable() {
             <tr>
               <th></th>
               <th>CVE</th>
+              <th>Description</th>
+              <th>CVSS</th>
+              <th>Severity</th>
               <th>Num. Functions</th>
               <th>Model Prediction</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {cves.isLoading || isSearchLoading ? (
+            {isLoading ? (
               <tr>
-                <td className="text-center" colSpan={5}>
+                <td className="text-center" colSpan={8}>
                   Loading...
                 </td>
               </tr>
             ) : cves.isError ? (
               <tr>
-                <td className="text-center" colSpan={5}>
+                <td className="text-center" colSpan={8}>
                   Error
                 </td>
               </tr>
-            ) : cves.data.length === 0 ? (
+            ) : cves.data?.length === 0 ? (
               <tr>
-                <td className="text-center" colSpan={5}>
+                <td className="text-center" colSpan={8}>
                   No data
                 </td>
               </tr>
             ) : (
-              cves.data.map((cve) => {
+              cves?.data?.map((cve) => {
                 const correctPredictionsV1 = cve.funcs.reduce(
                   (acc, func) =>
                     acc +
@@ -253,6 +308,24 @@ export function CVEsTable() {
                           />
                           <span className="pr-2">{cve.name}</span>
                         </a>
+                      </div>
+                    </td>
+                    <td>{cve.description}</td>
+                    <td>
+                      {cve.cvss_3_base_score || cve.cvss_2_base_score || "None"}
+                    </td>
+                    <td>
+                      <div
+                        className={clsx(
+                          "badge",
+                          cve.severity === "LOW"
+                            ? "badge-success"
+                            : cve.severity === "MEDIUM"
+                            ? "bg-warning "
+                            : "badge-error"
+                        )}
+                      >
+                        {cve.severity}
                       </div>
                     </td>
                     <td>
