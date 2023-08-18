@@ -32,9 +32,16 @@ async function getCVEs(
   return res.data.data;
 }
 
-async function getCVEsCount(): Promise<number> {
-  const res = await axios.get("/cves/count");
-
+async function getCVEsCount(
+  search?: string,
+  severity?: "LOW" | "MEDIUM" | "HIGH"
+): Promise<number> {
+  const res = await axios.get("/cves/count", {
+    params: {
+      search: search ?? undefined,
+      severity: severity ?? undefined
+    }
+  });
   return res.data.data.count;
 }
 
@@ -43,8 +50,8 @@ export type CVE = {
   name: string;
   description?: string;
   severity?: "LOW" | "MEDIUM" | "HIGH";
-  cvss_2_base_score?: number;
-  cvss_3_base_score?: number;
+  cvss2_base_score?: number;
+  cvss3_base_score?: number;
   funcs: Func[];
 };
 
@@ -135,22 +142,30 @@ export function CVEsTable() {
     { page, itemsPerPage, search, severity },
     1500
   );
-  const isSearchLoading = useMemo(
-    () => debouncedValues.search !== search,
-    [debouncedValues.search, search]
-  );
 
   const cves = useQuery({
-    queryKey: ["cves", page, itemsPerPage, debouncedValues.search, severity],
+    queryKey: [
+      "cves",
+      debouncedValues.page,
+      debouncedValues.itemsPerPage,
+      debouncedValues.search,
+      severity
+    ],
     queryFn: async () =>
-      getCVEs(itemsPerPage, page, true, debouncedValues.search, severity),
+      getCVEs(
+        debouncedValues.itemsPerPage,
+        debouncedValues.page,
+        true,
+        debouncedValues.search,
+        severity
+      ),
     keepPreviousData: true,
     refetchOnWindowFocus: false
   });
 
   const count = useQuery({
-    queryKey: ["cvesCount"],
-    queryFn: getCVEsCount,
+    queryKey: ["cvesCount", debouncedValues.search, severity],
+    queryFn: () => getCVEsCount(debouncedValues.search, severity),
     refetchOnWindowFocus: false
   });
 
@@ -160,15 +175,21 @@ export function CVEsTable() {
         cves.isLoading,
         count.isLoading,
         debouncedValues.search !== search,
-        debouncedValues.severity !== severity
+        debouncedValues.severity !== severity,
+        debouncedValues.page !== page,
+        debouncedValues.itemsPerPage !== itemsPerPage
       ].some(Boolean),
     [
       cves.isLoading,
       count.isLoading,
       debouncedValues.search,
-      debouncedValues.severity,
       search,
-      severity
+      debouncedValues.severity,
+      severity,
+      debouncedValues.page,
+      page,
+      debouncedValues.itemsPerPage,
+      itemsPerPage
     ]
   );
 
@@ -231,10 +252,10 @@ export function CVEsTable() {
               defaultValue="All"
               disabled
             >
-              <option>All</option>
+              {/* <option>All</option>
               <option>CVE</option>
               <option>CWE</option>
-              <option>Description</option>
+              <option>Description</option> */}
             </select>
           </div>
         </div>
@@ -291,9 +312,8 @@ export function CVEsTable() {
                     ).length,
                   0
                 );
-
                 return (
-                  <tr className="hover" key={cve.id}>
+                  <tr key={cve.id}>
                     <th>{cve.id}</th>
                     <td>
                       <div className="indicator">
@@ -310,18 +330,27 @@ export function CVEsTable() {
                         </a>
                       </div>
                     </td>
-                    <td>{cve.description}</td>
                     <td>
-                      {cve.cvss_3_base_score || cve.cvss_2_base_score || "None"}
+                      <pre className="whitespace-pre-wrap">
+                        {cve.description &&
+                          (cve.description.length > 100
+                            ? `${cve.description.substring(0, 150)}...`
+                            : cve.description)}
+                      </pre>
+                    </td>
+                    <td>
+                      <span className="font-bold">
+                        {cve.cvss3_base_score || cve.cvss2_base_score || "None"}
+                      </span>
                     </td>
                     <td>
                       <div
                         className={clsx(
-                          "badge",
+                          "badge font-bold",
                           cve.severity === "LOW"
                             ? "badge-success"
                             : cve.severity === "MEDIUM"
-                            ? "bg-warning "
+                            ? "bg-warning text-black"
                             : "badge-error"
                         )}
                       >

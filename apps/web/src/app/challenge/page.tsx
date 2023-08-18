@@ -360,12 +360,12 @@ export default function Start() {
                   </div>
                 </span>
                 <p>
-                  AI <span className="text-xs text-gray-500">V1, GPU</span>
+                  AI <span className="text-xs text-gray-500">V1, CPU</span>
                 </p>
               </div>
               <ProgressIndicator
                 total={10}
-                current={GPUCurrent}
+                current={10}
                 errorIndexes={
                   funcs.isSuccess
                     ? getModelPredictionErrorIndexes(

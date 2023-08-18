@@ -21,14 +21,15 @@ const getCVEsSchema = z.object({
     include_code: z
       .string()
       .transform((v) => (v.length >= 0 ? true : false))
-      .optional()
+      .optional(),
+    severity: z.string().default("")
   })
 });
 
 export const routes = Router()
   .get("/cves", async (req, res) => {
     const {
-      query: { search, limit, page, num_lines, include_code }
+      query: { search, limit, page, num_lines, include_code, severity }
     } = await validate(getCVEsSchema, req);
 
     const cves = await db.query.cve.findMany({
@@ -43,20 +44,33 @@ export const routes = Router()
       },
       limit: limit,
       offset: (page - 1) * limit,
-      where: or(
-        like(cve.name, `%${search}%`),
-        like(cve.description, `%${search}%`)
+      where: and(
+        or(like(cve.name, `%${search}%`), like(cve.description, `%${search}%`)),
+        like(cve.severity, `%${severity}%`)
       )
     });
 
     res.json({ meta: { count: cves.length }, data: cves });
   })
   .get("/cves/count", async (req, res) => {
+    const {
+      query: { search, severity }
+    } = await validate(getCVEsSchema, req);
+
     const data = await db
       .select({
         count: sql`count(*)`.mapWith(Number)
       })
-      .from(schema.cve);
+      .from(schema.cve)
+      .where(
+        and(
+          or(
+            like(cve.name, `%${search}%`),
+            like(cve.description, `%${search}%`)
+          ),
+          like(cve.severity, `%${severity}%`)
+        )
+      );
     const count = data[0].count;
     res.json({ data: { count } });
   })
