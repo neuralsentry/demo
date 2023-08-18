@@ -87,6 +87,18 @@ export const routes = Router()
     res.json({ data: { count } });
   })
   .get("/functions", async (req, res) => {
+    const getFunctionsSchema = z.object({
+      query: z.object({
+        vulnOnly: z.coerce.boolean().default(false),
+        nonVulnOnly: z.coerce.boolean().default(false),
+        page: z.coerce.number().min(1).default(1)
+      })
+    });
+
+    const {
+      query: { vulnOnly, nonVulnOnly, page }
+    } = await validate(getFunctionsSchema, req);
+
     const randomise = typeof req.query.randomise === "string";
     const minNumLines = req.query.minNumLines as string | undefined;
     const maxNumLines = req.query.maxNumLines as string | undefined;
@@ -140,11 +152,13 @@ export const routes = Router()
     const funcs = await db.query.func.findMany({
       with: { cve: true, model_predictions: true },
       limit: limitInt,
-      offset: offsetInt,
+      offset: limitInt * (page - 1),
       orderBy: randomise ? sql`random()` : sql`id`,
       where: and(
         gte(schema.func.num_lines, minNumLinesInt ?? 0),
-        lte(schema.func.num_lines, maxNumLinesInt ?? 1000000)
+        lte(schema.func.num_lines, maxNumLinesInt ?? 1000000),
+        vulnOnly ? eq(schema.func.labels, 1) : undefined,
+        nonVulnOnly ? not(eq(schema.func.labels, 1)) : undefined
       )
     });
 

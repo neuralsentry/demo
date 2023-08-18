@@ -6,7 +6,7 @@ import { ExternalLink, Info } from "lucide-react";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce, useLocalStorage } from "usehooks-ts";
 
 import { axios } from "@/shared/axios";
 import { CodeBlock } from "@/app/challenge/components/code-block";
@@ -138,9 +138,11 @@ export function CVEsTable() {
   }, [itemsPerPage]);
 
   const [severity, setSeverity] = useState("" as "LOW" | "MEDIUM" | "HIGH");
+  const [delay, setDelay] = useLocalStorage("delay", 1500);
+
   const debouncedValues = useDebounce(
     { page, itemsPerPage, search, severity },
-    1500
+    delay
   );
 
   const cves = useQuery({
