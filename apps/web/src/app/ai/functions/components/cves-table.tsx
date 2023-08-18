@@ -3,9 +3,10 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { ExternalLink, Info } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useDebounce } from "usehooks-ts";
 
 import { axios } from "@/shared/axios";
 import { CodeBlock } from "@/app/challenge/components/code-block";
@@ -13,14 +14,16 @@ import { CodeBlock } from "@/app/challenge/components/code-block";
 async function getCVEs(
   limit = 10,
   page = 1,
-  includeCode = true
+  includeCode = true,
+  search?: string
 ): Promise<CVE[]> {
   const res = await axios.get("/cves", {
     params: {
       limit,
       page,
-      num_lines: 1000000000, // get all functions
-      include_code: includeCode ? "" : undefined
+      num_lines: 999_999, // get all functions
+      include_code: includeCode ? "" : undefined,
+      search: search ?? undefined
     }
   });
 
@@ -61,6 +64,11 @@ export function CVEsTable() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const debouncedSearch = useDebounce(search, 1.5 * 1000);
+  const isSearchLoading = useMemo(
+    () => debouncedSearch !== search,
+    [debouncedSearch, search]
+  );
 
   const handleSearch = useCallback(
     (search: string) => {
@@ -122,11 +130,17 @@ export function CVEsTable() {
   }, [itemsPerPage]);
 
   const cves = useQuery({
-    queryKey: ["cves", page, itemsPerPage],
-    queryFn: async () => getCVEs(itemsPerPage, page),
-    keepPreviousData: true
+    queryKey: ["cves", page, itemsPerPage, debouncedSearch],
+    queryFn: async () => getCVEs(itemsPerPage, page, true, debouncedSearch),
+    keepPreviousData: true,
+    refetchOnWindowFocus: false
   });
-  const count = useQuery({ queryKey: ["cvesCount"], queryFn: getCVEsCount });
+
+  const count = useQuery({
+    queryKey: ["cvesCount"],
+    queryFn: getCVEsCount,
+    refetchOnWindowFocus: false
+  });
 
   const [funcIndex, setFuncIndex] = useState(0);
 
@@ -186,7 +200,7 @@ export function CVEsTable() {
             </tr>
           </thead>
           <tbody>
-            {cves.isLoading ? (
+            {cves.isLoading || isSearchLoading ? (
               <tr>
                 <td className="text-center" colSpan={5}>
                   Loading...
@@ -196,6 +210,12 @@ export function CVEsTable() {
               <tr>
                 <td className="text-center" colSpan={5}>
                   Error
+                </td>
+              </tr>
+            ) : cves.data.length === 0 ? (
+              <tr>
+                <td className="text-center" colSpan={5}>
+                  No data
                 </td>
               </tr>
             ) : (

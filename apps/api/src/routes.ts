@@ -3,17 +3,18 @@ import { Router } from "express";
 import httpError from "http-errors";
 import httpStatus from "http-status";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { sql, and, lte, gte, eq, not } from "drizzle-orm";
+import { sql, and, lte, gte, eq, not, like, or } from "drizzle-orm";
 
 import { validate } from "@/shared/utils";
 import { client } from "@/shared/db/client";
 import * as schema from "@/shared/db/schema";
-import { modelPrediction, func } from "@/shared/db/schema";
+import { cve, func } from "@/shared/db/schema";
 
 const db = drizzle(client, { schema });
 
 const getCVEsSchema = z.object({
   query: z.object({
+    search: z.string().default(""),
     limit: z.coerce.number().min(1).max(50).default(10),
     page: z.coerce.number().min(1).default(1),
     num_lines: z.coerce.number().min(1).default(10),
@@ -27,7 +28,7 @@ const getCVEsSchema = z.object({
 export const routes = Router()
   .get("/cves", async (req, res) => {
     const {
-      query: { limit, page, num_lines, include_code }
+      query: { search, limit, page, num_lines, include_code }
     } = await validate(getCVEsSchema, req);
 
     const cves = await db.query.cve.findMany({
@@ -35,15 +36,17 @@ export const routes = Router()
         funcs: {
           columns: include_code ? undefined : { code: false },
           with: {
-            model_predictions: {
-              // where: eq(modelPrediction.model_id, 1)
-            }
+            model_predictions: true
           },
           where: lte(func.num_lines, num_lines)
         }
       },
       limit: limit,
-      offset: (page - 1) * limit
+      offset: (page - 1) * limit,
+      where: or(
+        like(cve.name, `%${search}%`),
+        like(cve.description, `%${search}%`)
+      )
     });
 
     res.json({ meta: { count: cves.length }, data: cves });
