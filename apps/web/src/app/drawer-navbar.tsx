@@ -161,11 +161,7 @@ export function DrawerNavbar({ children }: Props) {
 
               <div className="dropdown dropdown-hover dropdown-end">
                 <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
-                  <a
-                    href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
-                    target="_blank"
-                    className="block"
-                  >
+                  <a href="/report.pdf" target="_blank" className="block">
                     <Newspaper size={20} />
                   </a>
                 </button>
@@ -291,11 +287,7 @@ export function DrawerNavbar({ children }: Props) {
                 </a>
               </li>
               <li>
-                <a
-                  href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
-                  target="_blank"
-                  className="block"
-                >
+                <a href="/report.pdf" target="_blank" className="block">
                   Report
                   <br />
                   <span className="text-xs text-gray-500">
