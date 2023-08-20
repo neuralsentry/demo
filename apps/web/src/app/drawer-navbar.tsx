@@ -171,11 +171,7 @@ export function DrawerNavbar({ children }: Props) {
                 </button>
                 <ul className="dropdown-content absolute menu p-2 shadow bg-base-100 border border-base-300 rounded-box w-52">
                   <li>
-                    <a
-                      href="https://drive.google.com/file/d/1swedlrjc0KrED4Cz1RtUNDBk9Ns3KS5H/view?usp=sharing"
-                      target="_blank"
-                      className="block"
-                    >
+                    <a href="/report.pdf" target="_blank" className="block">
                       Report
                       <br />
                       <span className="text-xs text-gray-500">
