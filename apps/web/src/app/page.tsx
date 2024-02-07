@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Banner } from "./banner";
 
 export default function Home() {
   return (
     <main className="flex flex-col items-center mb-52 md:mb-32 2xl:mb-12 px-2">
+      <Banner />
       <header className="flex flex-col items-center text-center mt-[100px]">
         <h1 className="text-5xl md:text-6xl font-bold max-w-[500px] lg:max-w-full">
           Are you up for a <span className="text-secondary">challenge</span>?

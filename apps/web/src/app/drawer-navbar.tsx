@@ -101,7 +101,7 @@ export function DrawerNavbar({ children }: Props) {
 
             <div className="navbar-end gap-x-2 hidden lg:flex items-center">
               <div className="dropdown dropdown-hover dropdown-end">
-                <button className="btn btn-square btn-outline btn-sm border-neutral-600">
+                <button className="btn btn-square btn-outline btn-sm border-neutral-600 mt-1">
                   <a
                     href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
                     target="_blank"
@@ -137,8 +137,8 @@ export function DrawerNavbar({ children }: Props) {
                     <Image
                       src="/huggingface.svg"
                       alt="HuggingFace Logo"
-                      width={29}
-                      height={29}
+                      width={22}
+                      height={22}
                     />
                   </a>
                 </button>
@@ -262,19 +262,6 @@ export function DrawerNavbar({ children }: Props) {
             <ul>
               <li>
                 <a
-                  href="https://huggingface.co/neuralsentry"
-                  target="_blank"
-                  className="block"
-                >
-                  HuggingFace
-                  <br />
-                  <span className="text-xs text-gray-500">
-                    Our AI models and datasets
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
                   href="https://github.com/neuralsentry/vulnfix-commit-llm-classifier"
                   target="_blank"
                   className="block"
@@ -283,6 +270,19 @@ export function DrawerNavbar({ children }: Props) {
                   <br />
                   <span className="text-xs text-gray-500">
                     The tool utilising our AI NLP model
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://huggingface.co/neuralsentry"
+                  target="_blank"
+                  className="block"
+                >
+                  HuggingFace
+                  <br />
+                  <span className="text-xs text-gray-500">
+                    Our AI models and datasets
                   </span>
                 </a>
               </li>
