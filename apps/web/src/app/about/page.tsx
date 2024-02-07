@@ -54,7 +54,7 @@ export default function About() {
             <b>
               Training and Evaluating Open-Source{" "}
               <span
-                className="tooltip tooltip-right underline decoration-dotted"
+                className="tooltip underline decoration-dotted"
                 data-tip="Large Language Models"
               >
                 LLMs
